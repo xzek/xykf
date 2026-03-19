@@ -59,7 +59,8 @@
     updateIdDisplay(); // 页面加载时如果有历史 ID 就显示出来
     let isPolling = false;
     let historyLoaded = false;
-
+    let widgetConfig = { agent_icon: '', user_icon: '' };
+    fetch(`${API_BASE}/api/customer/config`).then(r => r.json()).then(data => widgetConfig = data).catch(e => {});
     function appendMsg(text, sender) {
         const row = document.createElement("div");
         row.className = `cs-msg-row ${sender}`;
@@ -67,9 +68,11 @@
         const avatar = document.createElement("img");
         avatar.className = "cs-avatar";
         const seed = sender === 'agent' ? 'kefu' : (userId || Math.random());
-        avatar.src = sender === 'agent' 
-            ? 'https://api.dicebear.com/7.x/bottts/svg?seed=kefu' 
-            : `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`;
+        if (sender === 'agent') {
+            avatar.src = widgetConfig.agent_icon || 'https://api.dicebear.com/7.x/bottts/svg?seed=kefu';
+        } else {
+            avatar.src = widgetConfig.user_icon || `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`;
+        }
         const msgDiv = document.createElement("div");
         msgDiv.className = `cs-msg ${sender}`;
         msgDiv.innerText = text;
