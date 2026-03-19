@@ -30,7 +30,7 @@
 
     const widgetHtml = `
         <div id="cs-panel">
-            <div id="cs-header"><span>💬 在线客服</span><span id="cs-close">&times;</span></div>
+            <div id="cs-header"><span>💬 在线客服<span id="cs-id-display" style="font-size:12px; font-weight:normal; margin-left:8px;"></span></span><span id="cs-close">&times;</span></div>
             <div id="cs-chat"></div>
             <div id="cs-input-area">
                 <input type="text" id="cs-input" placeholder="输入你想咨询的问题...">
@@ -50,7 +50,13 @@
     const chat = document.getElementById("cs-chat");
     const input = document.getElementById("cs-input");
     const sendBtn = document.getElementById("cs-send");
-
+    const idDisplay = document.getElementById("cs-id-display");
+    function updateIdDisplay() {
+        if (idDisplay && userId) {
+            idDisplay.innerText = `[客户ID:${userId}]`;
+        }
+    }
+    updateIdDisplay(); // 页面加载时如果有历史 ID 就显示出来
     let isPolling = false;
     let historyLoaded = false;
 
@@ -126,6 +132,7 @@
             if (data.success && data.userId && !userId) {
                 userId = data.userId;
                 localStorage.setItem("cs_user_id", userId);
+                updateIdDisplay();
             }
         } catch (e) { console.error("发送失败", e); }
     }
