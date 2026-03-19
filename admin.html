@@ -6,37 +6,54 @@
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: #f0f2f5; display: flex; height: 100vh; }
         .hidden { display: none !important; }
+        
+        /* 登录页面样式 */
         #login-container { width: 100%; display: flex; justify-content: center; align-items: center; }
         .login-box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 320px; }
         .login-box h2 { margin-top: 0; text-align: center; }
         .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 12px; color: #666; margin-bottom: 5px;}
-        .input-group input, .input-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 10px; background: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-bottom: 10px;}
+        .input-group label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; font-weight: 500;}
+        .input-group input, .input-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; transition: border 0.3s; }
+        .input-group input:focus, .input-group textarea:focus { border-color: #1890ff; outline: none; }
+        .btn { width: 100%; padding: 10px; background: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-bottom: 10px; transition: background 0.3s;}
         .btn:hover { background: #40a9ff; }
+        .btn.secondary { background: #fff; color: #666; border: 1px solid #d9d9d9; }
+        .btn.secondary:hover { background: #f5f5f5; color: #333; border-color: #ccc; }
         
+        /* 后台主框架样式 */
         #admin-container { width: 100%; display: flex; }
+        
+        /* 左侧边栏 */
         #sidebar { width: 300px; background: white; border-right: 1px solid #e8e8e8; display: flex; flex-direction: column; }
         .sidebar-header { padding: 20px; border-bottom: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-header button { display: flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 15px; transition: background 0.2s; }
+        .sidebar-header button:hover { background: #f0f5ff; }
         .user-list { flex: 1; overflow-y: auto; }
-        .user-item { padding: 15px 20px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
-        .user-item:hover, .user-item.active { background: #e6f7ff; }
+        .user-item { padding: 15px 20px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.2s; }
+        .user-item:hover, .user-item.active { background: #e6f7ff; border-right: 3px solid #1890ff; }
         .user-id { font-weight: bold; margin-bottom: 5px; color: #333; }
         .user-msg { font-size: 12px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* 右侧 - 聊天视图 */
         #main-chat { flex: 1; display: flex; flex-direction: column; background: #f0f2f5; }
-        #chat-header { padding: 20px; background: white; border-bottom: 1px solid #e8e8e8; font-size: 18px; font-weight: bold; }
+        #chat-header { padding: 20px; background: white; border-bottom: 1px solid #e8e8e8; font-size: 18px; font-weight: bold; display: flex; align-items: center; }
         #chat-window { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 60%; padding: 10px 15px; border-radius: 8px; font-size: 14px; line-height: 1.5; }
-        .msg.user { background: white; align-self: flex-start; border: 1px solid #e8e8e8; }
-        .msg.agent { background: #95ec69; align-self: flex-end; }
+        .msg { max-width: 60%; padding: 10px 15px; border-radius: 8px; font-size: 14px; line-height: 1.5; word-wrap: break-word;}
+        .msg.user { background: white; align-self: flex-start; border: 1px solid #e8e8e8; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .msg.agent { background: #95ec69; align-self: flex-end; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
         #chat-input-area { padding: 20px; background: white; border-top: 1px solid #e8e8e8; display: flex; gap: 10px; }
-        #chat-input { flex: 1; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px; outline: none; }
-        #send-btn { width: 100px; }
+        #chat-input { flex: 1; padding: 10px 15px; border: 1px solid #d9d9d9; border-radius: 4px; outline: none; font-size: 14px;}
+        #chat-input:focus { border-color: #1890ff; }
+        #send-btn { width: 100px; margin-bottom: 0; }
 
-        #settings-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;}
-        .settings-box { width: 400px; max-height: 90vh; overflow-y: auto; }
+        /* 右侧 - 设置视图 (独立页面) */
+        #settings-view { flex: 1; display: flex; flex-direction: column; background: #f0f2f5; }
+        #settings-header { padding: 20px; background: white; border-bottom: 1px solid #e8e8e8; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        #settings-content { flex: 1; overflow-y: auto; padding: 30px; }
+        .settings-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
+        .settings-card h3 { margin-top: 0; margin-bottom: 20px; font-size: 16px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; color: #333; }
+        .settings-actions { display: flex; gap: 15px; margin-top: 30px; }
     </style>
 </head>
 <body>
@@ -51,13 +68,17 @@
     </div>
 
     <div id="admin-container" class="hidden">
+        
         <div id="sidebar">
             <div class="sidebar-header">
                 <b>客户列表</b>
-                <button onclick="showSettings()" style="cursor:pointer; border:none; background:none; color:#1890ff;">⚙️ 设置</button>
+                <button onclick="showSettings()" style="cursor:pointer; border:none; background:none; color:#1890ff; font-weight:500;">
+                    ⚙️ 系统设置
+                </button>
             </div>
             <div class="user-list" id="user-list"></div>
         </div>
+
         <div id="main-chat">
             <div id="chat-header">请选择一个客户</div>
             <div id="chat-window"></div>
@@ -66,39 +87,48 @@
                 <button class="btn" id="send-btn" onclick="sendReply()">发送</button>
             </div>
         </div>
-    </div>
 
-    <div id="settings-modal" class="hidden">
-        <div class="login-box settings-box">
-            <h2>系统设置</h2>
-            
-            <div class="input-group">
-                <label>📌 网页插件引入代码 (复制并粘贴到你的网站 HTML 的 &lt;body&gt; 底部)</label>
-                <textarea id="embed-code" rows="3" readonly style="font-family: monospace; font-size: 11px; background: #f9f9f9;" onclick="this.select()"></textarea>
+        <div id="settings-view" class="hidden">
+            <div id="settings-header">
+                <span>系统设置</span>
+                <button onclick="closeSettings()" style="cursor:pointer; border:none; background:none; color:#999; font-size:16px;">✖ 返回聊天</button>
             </div>
-            
-            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-            
-            <div class="input-group">
-                <label>修改账号 (留空不修改)</label>
-                <input type="text" id="set-username" placeholder="新用户名">
+            <div id="settings-content">
+                <div class="settings-card">
+                    <h3>🖥️ 网站接入</h3>
+                    <div class="input-group">
+                        <label>📌 网页插件引入代码 (复制并粘贴到你的网站 HTML 的 &lt;body&gt; 底部)</label>
+                        <textarea id="embed-code" rows="2" readonly style="font-family: monospace; font-size: 12px; background: #f9f9f9; resize: none;" onclick="this.select()"></textarea>
+                    </div>
+                    
+                    <h3 style="margin-top: 30px;">🔐 账号安全</h3>
+                    <div class="input-group">
+                        <label>修改账号 (留空不修改)</label>
+                        <input type="text" id="set-username" placeholder="输入新用户名">
+                    </div>
+                    <div class="input-group">
+                        <label>修改密码 (留空不修改)</label>
+                        <input type="password" id="set-password" placeholder="输入新密码">
+                    </div>
+                    
+                    <h3 style="margin-top: 30px;">🤖 Telegram 机器人推送</h3>
+                    <div class="input-group">
+                        <label>Telegram Bot Token (可选)</label>
+                        <input type="text" id="set-tg-token" placeholder="形如: 1234567:ABCDEFG...">
+                    </div>
+                    <div class="input-group">
+                        <label>Telegram 超级群聊 ID (可选)</label>
+                        <input type="text" id="set-tg-chatid" placeholder="形如: -1001234567">
+                    </div>
+                    
+                    <div class="settings-actions">
+                        <button class="btn" onclick="updateSettings()">保存设置</button>
+                        <button class="btn secondary" onclick="closeSettings()">取消</button>
+                    </div>
+                </div>
             </div>
-            <div class="input-group">
-                <label>修改密码 (留空不修改)</label>
-                <input type="password" id="set-password" placeholder="新密码">
-            </div>
-            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-            <div class="input-group">
-                <label>Telegram Bot Token (可选)</label>
-                <input type="text" id="set-tg-token" placeholder="形如: 1234:ABCDEFG...">
-            </div>
-            <div class="input-group">
-                <label>Telegram 超级群聊 ID (可选)</label>
-                <input type="text" id="set-tg-chatid" placeholder="形如: -1001234567">
-            </div>
-            <button class="btn" onclick="updateSettings()">保存设置</button>
-            <button class="btn" onclick="closeSettings()" style="background: #ccc;">取消关闭</button>
         </div>
+
     </div>
 
 <script>
@@ -121,7 +151,7 @@
         const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${getToken()}` };
         const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
         if (res.status === 401) {
-            alert("登录已过期");
+            alert("登录已过期，请重新登录");
             localStorage.removeItem("cs_admin_token");
             location.reload();
         }
@@ -152,7 +182,6 @@
             const div = document.createElement("div");
             div.className = `user-item ${u.id == activeUserId ? 'active' : ''}`;
             div.onclick = () => selectUser(u.id);
-            // 这里直接显示原生数字 ID
             div.innerHTML = `<div class="user-id">客户 ${u.id}</div><div class="user-msg">${u.last_message || '无消息'}</div>`;
             listDiv.appendChild(div);
         });
@@ -160,16 +189,32 @@
 
     async function selectUser(userId) {
         activeUserId = userId;
-        document.getElementById('chat-header').innerText = `正在与 客户 ${userId} 聊天`;
+        
+        // 点击客户时，确保隐藏设置界面，显示聊天界面
+        document.getElementById('settings-view').classList.add('hidden');
+        document.getElementById('main-chat').classList.remove('hidden');
+
+        document.getElementById('chat-header').innerHTML = `正在与 <span style="color:#1890ff; margin-left:5px;">客户 ${userId}</span> 聊天`;
         document.getElementById('chat-input-area').classList.remove('hidden');
-        loadUsers();
+        
+        loadUsers(); // 刷新高亮状态
         await pollCurrentChat();
     }
 
     async function pollCurrentChat() {
         if (!activeUserId) return;
+        
+        // 如果当前停留在设置页面，暂时不强制滚动或刷新聊天窗口，以免影响后台性能
+        if (!document.getElementById('settings-view').classList.contains('hidden')) {
+            return;
+        }
+
         const data = await apiFetch(`/api/admin/messages?userId=${activeUserId}`);
         const win = document.getElementById('chat-window');
+        
+        // 简单的比对长度判断是否需要滚动 (防止用户在往上翻看聊天记录时被强制拉到底部)
+        const isScrolledToBottom = win.scrollHeight - win.clientHeight <= win.scrollTop + 10;
+        
         win.innerHTML = "";
         data.messages.forEach(m => {
             const div = document.createElement("div");
@@ -177,7 +222,10 @@
             div.innerText = m.content;
             win.appendChild(div);
         });
-        win.scrollTop = win.scrollHeight;
+
+        if (isScrolledToBottom) {
+            win.scrollTop = win.scrollHeight;
+        }
     }
 
     async function sendReply() {
@@ -191,16 +239,26 @@
 
     document.getElementById('chat-input').onkeypress = (e) => { if (e.key === 'Enter') sendReply(); };
 
+    // ======= 新的系统设置展示与隐藏逻辑 =======
     async function showSettings() { 
-        document.getElementById('settings-modal').classList.remove('hidden'); 
+        // 隐藏聊天主界面，显示设置独立页面
+        document.getElementById('main-chat').classList.add('hidden');
+        document.getElementById('settings-view').classList.remove('hidden'); 
+        
         const currentDomain = window.location.origin;
         document.getElementById('embed-code').value = `<script src="${currentDomain}/widget.js"><\/script>`;
+        
+        // 拉取配置填充
         const data = await apiFetch("/api/admin/config");
         document.getElementById('set-tg-token').value = data.tg_bot_token || "";
         document.getElementById('set-tg-chatid').value = data.tg_chat_id || "";
     }
     
-    function closeSettings() { document.getElementById('settings-modal').classList.add('hidden'); }
+    function closeSettings() { 
+        // 隐藏设置独立页面，恢复聊天主界面
+        document.getElementById('settings-view').classList.add('hidden');
+        document.getElementById('main-chat').classList.remove('hidden');
+    }
     
     async function updateSettings() {
         const u = document.getElementById('set-username').value;
@@ -214,8 +272,9 @@
 
         await apiFetch("/api/admin/update-config", { method: "POST", body: JSON.stringify(payload) });
         
-        alert("设置保存成功！如果修改了密码，请重新登录。");
+        alert("设置保存成功！");
         if (p || u) {
+            alert("账号或密码已修改，请重新登录。");
             localStorage.removeItem("cs_admin_token");
             location.reload();
         } else {
