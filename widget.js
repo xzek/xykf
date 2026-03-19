@@ -15,9 +15,12 @@
         #cs-header { background: #007bff; color: white; padding: 16px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         #cs-close { cursor: pointer; font-size: 22px; line-height: 1; }
         #cs-chat { flex: 1; padding: 16px; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; gap: 12px; }
-        .cs-msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
-        .cs-msg.user { align-self: flex-end; background: #007bff; color: white; border-bottom-right-radius: 4px; }
-        .cs-msg.agent { align-self: flex-start; background: #e5e5ea; color: black; border-bottom-left-radius: 4px; }
+        .cs-msg-row { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 5px; }
+        .cs-msg-row.user { flex-direction: row-reverse; }
+        .cs-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background: #e5e5ea; border: 1px solid #ddd; object-fit: cover; }
+        .cs-msg { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+        .cs-msg.user { background: #007bff; color: white; border-bottom-right-radius: 4px; }
+        .cs-msg.agent { background: #e5e5ea; color: black; border-bottom-left-radius: 4px; }
         #cs-input-area { display: flex; padding: 12px; border-top: 1px solid #eee; background: white; align-items: center; }
         #cs-input { flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px; outline: none; font-size: 14px; }
         #cs-input:focus { border-color: #007bff; }
@@ -52,12 +55,25 @@
     let historyLoaded = false;
 
     function appendMsg(text, sender) {
-        const div = document.createElement("div");
-        div.className = `cs-msg ${sender}`;
-        div.innerText = text;
-        chat.appendChild(div);
+        const row = document.createElement("div");
+        row.className = `cs-msg-row ${sender}`;
+        
+        const avatar = document.createElement("img");
+        avatar.className = "cs-avatar";
+        const seed = sender === 'agent' ? 'kefu' : (userId || Math.random());
+        avatar.src = sender === 'agent' 
+            ? 'https://api.dicebear.com/7.x/bottts/svg?seed=kefu' 
+            : `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`;
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `cs-msg ${sender}`;
+        msgDiv.innerText = text;
+
+        row.appendChild(avatar);
+        row.appendChild(msgDiv);
+        
+        chat.appendChild(row);
         chat.scrollTop = chat.scrollHeight;
-    }
+    }}
 
     async function loadHistory() {
         if (historyLoaded || !userId) return; // 如果还没有 ID，说明是新访客，不需要拉历史记录
