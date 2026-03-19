@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>在线客服管理后台</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: #f0f2f5; display: flex; height: 100vh; }
+        .hidden { display: none !important; }
+        #login-container { width: 100%; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 320px; }
+        .login-box h2 { margin-top: 0; text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; color: #666; margin-bottom: 5px;}
+        .input-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 10px; background: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-bottom: 10px;}
+        .btn:hover { background: #40a9ff; }
+        
+        #admin-container { width: 100%; display: flex; }
+        #sidebar { width: 300px; background: white; border-right: 1px solid #e8e8e8; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; }
+        .user-list { flex: 1; overflow-y: auto; }
+        .user-item { padding: 15px 20px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+        .user-item:hover, .user-item.active { background: #e6f7ff; }
+        .user-id { font-weight: bold; margin-bottom: 5px; color: #333; }
+        .user-msg { font-size: 12px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        #main-chat { flex: 1; display: flex; flex-direction: column; background: #f0f2f5; }
+        #chat-header { padding: 20px; background: white; border-bottom: 1px solid #e8e8e8; font-size: 18px; font-weight: bold; }
+        #chat-window { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 60%; padding: 10px 15px; border-radius: 8px; font-size: 14px; line-height: 1.5; }
+        .msg.user { background: white; align-self: flex-start; border: 1px solid #e8e8e8; }
+        .msg.agent { background: #95ec69; align-self: flex-end; }
+
+        #chat-input-area { padding: 20px; background: white; border-top: 1px solid #e8e8e8; display: flex; gap: 10px; }
+        #chat-input { flex: 1; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px; outline: none; }
+        #send-btn { width: 100px; }
+
+        #settings-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; }
+        .settings-box { width: 350px; }
+    </style>
+</head>
+<body>
+
+    <div id="login-container">
+        <div class="login-box">
+            <h2>客服控制台</h2>
+            <div class="input-group"><input type="text" id="username" placeholder="用户名 (默认 admin)"></div>
+            <div class="input-group"><input type="password" id="password" placeholder="密码 (默认 123456)"></div>
+            <button class="btn" onclick="login()">登录</button>
+        </div>
+    </div>
+
+    <div id="admin-container" class="hidden">
+        <div id="sidebar">
+            <div class="sidebar-header">
+                <b>客户列表</b>
+                <button onclick="showSettings()" style="cursor:pointer; border:none; background:none; color:#1890ff;">⚙️ 设置</button>
+            </div>
+            <div class="user-list" id="user-list"></div>
+        </div>
+        <div id="main-chat">
+            <div id="chat-header">请选择一个客户</div>
+            <div id="chat-window"></div>
+            <div id="chat-input-area" class="hidden">
+                <input type="text" id="chat-input" placeholder="输入回复内容，按回车发送...">
+                <button class="btn" id="send-btn" onclick="sendReply()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="hidden">
+        <div class="login-box settings-box">
+            <h2>系统设置</h2>
+            <div class="input-group">
+                <label>修改账号 (留空不修改)</label>
+                <input type="text" id="set-username" placeholder="新用户名">
+            </div>
+            <div class="input-group">
+                <label>修改密码 (留空不修改)</label>
+                <input type="password" id="set-password" placeholder="新密码">
+            </div>
+            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+            <div class="input-group">
+                <label>Telegram Bot Token</label>
+                <input type="text" id="set-tg-token" placeholder="形如: 1234:ABCDEFG...">
+            </div>
+            <div class="input-group">
+                <label>Telegram 超级群聊 ID</label>
+                <input type="text" id="set-tg-chatid" placeholder="形如: -1001234567">
+            </div>
+            <button class="btn" onclick="updateSettings()">保存设置</button>
+            <button class="btn" onclick="closeSettings()" style="background: #ccc;">取消关闭</button>
+        </div>
+    </div>
+
+<script>
+    const API_BASE = ""; // 与页面同源，无需填写前缀
+    let activeUserId = null;
+    let pollInterval = null;
+
+    function getToken() { return localStorage.getItem("cs_admin_token"); }
+
+    window.onload = () => {
+        if (getToken()) {
+            document.getElementById('login-container').classList.add('hidden');
+            document.getElementById('admin-container').classList.remove('hidden');
+            loadUsers();
+            pollInterval = setInterval(pollCurrentChat, 3000);
+        }
+    };
+
+    async function apiFetch(path, options = {}) {
+        const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${getToken()}` };
+        const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+        if (res.status === 401) {
+            alert("登录已过期");
+            localStorage.removeItem("cs_admin_token");
+            location.reload();
+        }
+        return res.json();
+    }
+
+    async function login() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        const res = await fetch(`${API_BASE}/api/admin/login`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: u, password: p })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            localStorage.setItem("cs_admin_token", data.token);
+            location.reload();
+        } else {
+            alert("账号或密码错误");
+        }
+    }
+
+    async function loadUsers() {
+        const data = await apiFetch("/api/admin/users");
+        const listDiv = document.getElementById('user-list');
+        listDiv.innerHTML = "";
+        data.users.forEach(u => {
+            const div = document.createElement("div");
+            div.className = `user-item ${u.id === activeUserId ? 'active' : ''}`;
+            div.onclick = () => selectUser(u.id);
+            div.innerHTML = `<div class="user-id">客户_${u.id.substring(0, 6)}</div><div class="user-msg">${u.last_message || '无消息'}</div>`;
+            listDiv.appendChild(div);
+        });
+    }
+
+    async function selectUser(userId) {
+        activeUserId = userId;
+        document.getElementById('chat-header').innerText = `正在与 客户_${userId.substring(0, 6)} 聊天`;
+        document.getElementById('chat-input-area').classList.remove('hidden');
+        loadUsers();
+        await pollCurrentChat();
+    }
+
+    async function pollCurrentChat() {
+        if (!activeUserId) return;
+        const data = await apiFetch(`/api/admin/messages?userId=${activeUserId}`);
+        const win = document.getElementById('chat-window');
+        win.innerHTML = "";
+        data.messages.forEach(m => {
+            const div = document.createElement("div");
+            div.className = `msg ${m.sender}`;
+            div.innerText = m.content;
+            win.appendChild(div);
+        });
+        win.scrollTop = win.scrollHeight;
+    }
+
+    async function sendReply() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text || !activeUserId) return;
+        input.value = "";
+        await apiFetch("/api/admin/reply", { method: "POST", body: JSON.stringify({ userId: activeUserId, content: text }) });
+        pollCurrentChat();
+    }
+
+    document.getElementById('chat-input').onkeypress = (e) => { if (e.key === 'Enter') sendReply(); };
+
+    // --- 设置相关逻辑 ---
+    async function showSettings() { 
+        document.getElementById('settings-modal').classList.remove('hidden'); 
+        const data = await apiFetch("/api/admin/config");
+        document.getElementById('set-tg-token').value = data.tg_bot_token || "";
+        document.getElementById('set-tg-chatid').value = data.tg_chat_id || "";
+    }
+    
+    function closeSettings() { document.getElementById('settings-modal').classList.add('hidden'); }
+    
+    async function updateSettings() {
+        const u = document.getElementById('set-username').value;
+        const p = document.getElementById('set-password').value;
+        const bt = document.getElementById('set-tg-token').value;
+        const ci = document.getElementById('set-tg-chatid').value;
+        
+        const payload = { botToken: bt, chatId: ci };
+        if (u) payload.username = u;
+        if (p) payload.password = p;
+
+        await apiFetch("/api/admin/update-config", {
+            method: "POST", body: JSON.stringify(payload)
+        });
+        
+        alert("设置保存成功！如果修改了密码，请重新登录。");
+        if (p || u) {
+            localStorage.removeItem("cs_admin_token");
+            location.reload();
+        } else {
+            closeSettings();
+        }
+    }
+</script>
+</body>
+</html>
