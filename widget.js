@@ -135,11 +135,19 @@
 
     toggle.onclick = () => { 
         panel.style.display = 'flex'; toggle.style.display = 'none'; 
-        unreadCount = 0; unreadBadge.style.display = 'none'; // 清空未读数并隐藏红点
+        unreadCount = 0; unreadBadge.style.display = 'none'; 
         loadHistory(); startPolling(); 
     };
-    close.onclick = () => { panel.style.display = 'none'; toggle.style.display = 'flex'; isPolling = false; };
+    
+    close.onclick = () => { 
+        panel.style.display = 'none'; toggle.style.display = 'flex'; 
+        // 关键点：去掉了 isPolling = false，这样即使关闭面板，也会在后台继续接收新消息
+    };
 
+    // 关键点：如果老访客重新打开网页（存在历史ID），主动在后台启动轮询检测
+    if (userId) {
+        startPolling();
+    }
     async function sendMessage() {
         const text = input.value.trim();
         if (!text) return;
