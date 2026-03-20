@@ -229,7 +229,7 @@ export default {
           const themeObj = await env.db.prepare("SELECT value FROM config WHERE key = 'widget_theme'").first();
           if (themeObj && themeObj.value) theme = themeObj.value;
         } catch (e) {}
-        return env.ASSETS.fetch(new Request(new URL(`/templates/${theme}.js`, request.url), request));
+        return env.ASSETS.fetch(new Request(new URL(`/templates/${theme.toLowerCase()}.js`, request.url), request));
       }
 
       return env.ASSETS.fetch(request);
