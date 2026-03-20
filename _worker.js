@@ -44,7 +44,8 @@ export default {
 
           if (url.pathname === "/api/admin/update-config" && method === "POST") {
             const reqData = await request.json();
-            const { username, password, botToken, chatId, agentIcon, userIcon, autoReply, quickReply } = reqData;
+            const { username, password, botToken, chatId, agentIcon, userIcon, autoReply, quickReply, widgetTheme } = reqData;
+            if (widgetTheme !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('widget_theme', ?)").bind(widgetTheme).run();
             if (agentIcon !== undefined) await env.db.prepare("UPDATE config SET value = ? WHERE key = 'agent_icon'").bind(agentIcon).run();
             if (userIcon !== undefined) await env.db.prepare("UPDATE config SET value = ? WHERE key = 'user_icon'").bind(userIcon).run();
             if (autoReply !== undefined) await env.db.prepare("UPDATE config SET value = ? WHERE key = 'auto_reply'").bind(autoReply).run();
@@ -222,6 +223,15 @@ export default {
       }
     }
 
-    return env.ASSETS.fetch(request);
+      if (url.pathname === "/widget.js") {
+        let theme = "widget";
+        try {
+          const themeObj = await env.db.prepare("SELECT value FROM config WHERE key = 'widget_theme'").first();
+          if (themeObj && themeObj.value) theme = themeObj.value;
+        } catch (e) {}
+        return env.ASSETS.fetch(new Request(new URL(`/templates/${theme}.js`, request.url), request));
+      }
+
+      return env.ASSETS.fetch(request);
   }
 };
