@@ -22,7 +22,7 @@
         #cs-unread { display: none; position: absolute; top: -2px; right: -2px; background: #ff3b30; color: white; font-size: 12px; font-weight: bold; padding: 0 6px; min-width: 10px; height: 22px; line-height: 20px; border-radius: 11px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         
        /* 聊天面板主窗体 - 毛玻璃边框与圆角 */
-        #cs-panel { position: absolute; bottom: 84px; right: 0; display: none; width: 360px; height: 580px; background: #ffffff; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.12); flex-direction: column; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); opacity: 0; transform: translateY(20px); transition: opacity 0.3s ease, transform 0.3s ease; }
+        #cs-panel { position: absolute; bottom: 35px; right: 0; display: none; width: 360px; height: 580px; background: #ffffff; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.12); flex-direction: column; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); opacity: 0; transform: translateY(20px); transition: opacity 0.3s ease, transform 0.3s ease; }
         /* 面板头部 - 渐变色 */
         #cs-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
         #cs-header-info { display: flex; flex-direction: column; }
