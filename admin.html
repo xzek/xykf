@@ -151,7 +151,15 @@
                     <input type="text" id="set-tg-chatid" placeholder="形如: -1001234567">
                 </div>
                 </div> <div id="tab-function" class="tab-pane">
-                    <h3>🎨 图标设置</h3>
+                <h3>🎨 界面模板</h3>
+                <div class="input-group">
+                    <label>对话框风格</label>
+                    <select id="set-widget-theme" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; outline: none; margin-bottom: 15px;">
+                        <option value="widget">默认风格 (widget.js)</option>
+                        <option value="WeChat">微信风格 (WeChat.js)</option>
+                    </select>
+                </div>
+                <h3>🎨 图标设置</h3>
                     <div class="input-group"><label>客服图标 URL</label><input type="text" id="set-agent-icon" placeholder="填入图片直链"></div>
                     <div class="input-group"><label>客户图标 URL</label><input type="text" id="set-user-icon" placeholder="填入图片直链"></div>
                 </div>
@@ -336,6 +344,7 @@
         const data = await apiFetch("/api/admin/config");
         document.getElementById('set-tg-token').value = data.tg_bot_token || "";
         document.getElementById('set-tg-chatid').value = data.tg_chat_id || "";
+        document.getElementById('set-widget-theme').value = data.widget_theme || "widget";
         document.getElementById('set-agent-icon').value = data.agent_icon || "";
         document.getElementById('set-user-icon').value = data.user_icon || "";
         document.getElementById('set-auto-reply').value = data.auto_reply || "";
@@ -387,6 +396,7 @@
         const payload = { 
             botToken: bt, 
             chatId: ci,
+            widgetTheme: document.getElementById('set-widget-theme').value,
             agentIcon: document.getElementById('set-agent-icon').value,
             userIcon: document.getElementById('set-user-icon').value,
             autoReply: document.getElementById('set-auto-reply').value,
