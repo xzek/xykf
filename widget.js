@@ -19,8 +19,8 @@
         .cs-msg-row.user { flex-direction: row-reverse; }
         .cs-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background: #e5e5ea; border: 1px solid #ddd; object-fit: cover; }
         .cs-msg { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
-        .cs-msg.user { background: #007bff; color: white; border-bottom-right-radius: 4px; }
-        .cs-msg.agent { background: #e5e5ea; color: black; border-bottom-left-radius: 4px; }
+        .cs-msg.user { background: #95ec69; color: black; border-radius: 4px; }
+        .cs-msg.agent { background: white; color: black; border-radius: 4px; border: 1px solid #eee; }
         #cs-input-area { display: flex; padding: 12px; border-top: 1px solid #eee; background: white; align-items: center; }
         #cs-input { flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 20px; outline: none; font-size: 14px; }
         #cs-input:focus { border-color: #007bff; }
