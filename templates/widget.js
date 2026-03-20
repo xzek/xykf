@@ -16,7 +16,7 @@
         /* 悬浮按钮 - 渐变色、阴影与悬浮放大效果 */
         #cs-toggle { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 64px; height: 64px; border-radius: 32px; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(118, 75, 162, 0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; }
         #cs-toggle:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 14px 28px rgba(118, 75, 162, 0.5); }
-        #cs-toggle svg { width: 32px; height: 32px; fill: white; transition: transform 0.3s; }
+        #cs-toggle svg { width: 47px; height: 47px; fill: white; transition: transform 0.3s; }
         
         /* 未读消息红点 */
         #cs-unread { display: none; position: absolute; top: -2px; right: -2px; background: #ff3b30; color: white; font-size: 12px; font-weight: bold; padding: 0 6px; min-width: 10px; height: 22px; line-height: 20px; border-radius: 11px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
@@ -107,7 +107,7 @@
             </div>
         </div>
         <button id="cs-toggle">
-            <svg viewBox="0 0 24 24" id="cs-toggle-icon"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M 15 50 A 35 35 0 1 1 61.5 83" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"></path><rect x="7" y="36" width="16" height="28" rx="88" fill="#FFFFFF"></rect><rect x="77" y="36" width="16" height="28" rx="88" fill="#FFFFFF"></rect><rect x="42" y="78" width="22" height="10" rx="88" fill="#FFFFFF"></rect><path fill-rule="evenodd" clip-rule="evenodd" d="M 50 25 A 25 25 0 1 1 43 74 L 32 83 L 31 66.2 A 25 25 0 0 1 50 25 Z M 34 44.5 A 5.5 5.5 0 1 1 34 55.5 A 5.5 5.5 0 1 1 34 44.5 Z M 50 44.5 A 5.5 5.5 0 1 1 50 55.5 A 5.5 5.5 0 1 1 50 44.5 Z M 66 44.5 A 5.5 5.5 0 1 1 66 55.5 A 5.5 5.5 0 1 1 66 44.5 Z" fill="#FFFFFF"></path></svg>
             <span id="cs-unread">0</span>
         </button>
         <audio id="cs-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
