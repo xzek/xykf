@@ -14,9 +14,12 @@
         #cs-panel { display: none; width: 340px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; margin-bottom: 15px; border: 1px solid #eee; }
         #cs-header { background: #007bff; color: white; padding: 16px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         #cs-close { cursor: pointer; font-size: 22px; line-height: 1; }
-        #cs-chat { flex: 1; padding: 16px; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; gap: 12px; }
-        .cs-msg-row { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 5px; }
+        #cs-chat { flex: 1; padding: 16px; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; }
+        .cs-msg-row { display: flex; align-items: flex-end; margin-bottom: 17px; }
+        .cs-msg-row:last-child { margin-bottom: 0; }
+        .cs-msg-row .cs-avatar { margin-right: 8px; }
         .cs-msg-row.user { flex-direction: row-reverse; }
+        .cs-msg-row.user .cs-avatar { margin-right: 0; margin-left: 8px; }
         .cs-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background: #e5e5ea; border: 1px solid #ddd; object-fit: cover; }
         .cs-msg { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
         .cs-msg.user { background: #95ec69; color: black; border-radius: 4px; }
