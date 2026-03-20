@@ -11,18 +11,18 @@
     const style = document.createElement('style');
     style.innerHTML = `
        /* 容器与全局字体 */
-        #cs-widget { position: fixed; bottom: 24px; right: 24px; z-index: 9999; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: flex-end; }
+        #cs-widget { position: fixed; bottom: 80px; right: 24px; z-index: 9999; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: flex-end; }
         #cs-widget * { outline: none !important; -webkit-tap-highlight-color: transparent !important; }
         /* 悬浮按钮 - 渐变色、阴影与悬浮放大效果 */
         #cs-toggle { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 64px; height: 64px; border-radius: 32px; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(118, 75, 162, 0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; }
         #cs-toggle:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 14px 28px rgba(118, 75, 162, 0.5); }
-        #cs-toggle svg { width: 47px; height: 47px; fill: white; transition: transform 0.3s; }
+        #cs-toggle svg { width: 58px; height: 58px; fill: white; transition: transform 0.3s; }
         
         /* 未读消息红点 */
         #cs-unread { display: none; position: absolute; top: -2px; right: -2px; background: #ff3b30; color: white; font-size: 12px; font-weight: bold; padding: 0 6px; min-width: 10px; height: 22px; line-height: 20px; border-radius: 11px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         
        /* 聊天面板主窗体 - 毛玻璃边框与圆角 */
-        #cs-panel { position: absolute; bottom: 18px; right: 0; display: none; width: 320px; height: 580px; background: #ffffff; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.12); flex-direction: column; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); opacity: 0; transform: translateY(20px); transition: opacity 0.3s ease, transform 0.3s ease; }
+        #cs-panel { position: absolute; bottom: 0px; right: 0; display: none; width: 320px; height: 580px; background: #ffffff; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.12); flex-direction: column; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); opacity: 0; transform: translateY(20px); transition: opacity 0.3s ease, transform 0.3s ease; }
         /* 面板头部 - 渐变色 */
         #cs-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
         #cs-header-info { display: flex; flex-direction: column; }
