@@ -9,6 +9,7 @@
     const style = document.createElement('style');
     style.innerHTML = `
         #cs-widget { position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        #cs-widget * { outline: none !important; -webkit-tap-highlight-color: transparent !important; }
         #cs-toggle { background: #007bff; color: white; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; transition: transform 0.2s; }
         #cs-toggle:hover { transform: scale(1.05); }
         #cs-panel { display: none; width: 340px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; margin-bottom: 15px; border: 1px solid #eee; }
