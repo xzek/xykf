@@ -833,6 +833,33 @@
         };
         reader.readAsDataURL(file);
     }
+    // 监听输入框粘贴图片功能
+    document.getElementById('chat-input').addEventListener('paste', function(e) {
+        if (!activeUserId) return; // 如果没有选中客户，不处理
+        
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (let index in items) {
+            const item = items[index];
+            // 判断粘贴的是不是图片类型
+            if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+                e.preventDefault(); // 阻止默认的粘贴文本行为
+                
+                const file = item.getAsFile();
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    const base64Img = event.target.result;
+                    // 调用现有的发送接口
+                    await apiFetch("/api/admin/reply", { 
+                        method: "POST", 
+                        body: JSON.stringify({ userId: activeUserId, content: "IMG:" + base64Img }) 
+                    });
+                    pollCurrentChat(); // 立即刷新聊天记录
+                };
+                reader.readAsDataURL(file);
+                return; // 找到图片并发送后，直接跳出循环
+            }
+        }
+    });
 </script>
 </body>
 </html>
