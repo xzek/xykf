@@ -139,15 +139,25 @@ export default {
                   }
               }
               
-              let tgMsg = topicId ? content : `客户ID:${userId} 发来消息：\n${content}`;
               if (content.startsWith("data:image/")) {
-                  tgMsg = topicId ? "[客户发来一张图片，请前往网页后台查看]" : `客户ID:${userId} 发来 [图片消息，请前往网页后台查看]`;
+                  const base64Data = content.split(',')[1];
+                  const mimeType = content.split(';')[0].split(':')[1];
+                  const binaryStr = atob(base64Data);
+                  const bytes = new Uint8Array(binaryStr.length);
+                  for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+                  const formData = new FormData();
+                  formData.append("chat_id", config.tg_chat_id);
+                  if (topicId) formData.append("message_thread_id", topicId);
+                  formData.append("photo", new Blob([bytes], { type: mimeType }), "image.png");
+                  if (!topicId) formData.append("caption", `客户ID:${userId} 发来图片：`);
+                  await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/sendPhoto`, { method: "POST", body: formData });
+              } else {
+                  let tgMsg = topicId ? content : `客户ID:${userId} 发来消息：\n${content}`;
+                  await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/sendMessage`, {
+                      method: "POST", headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ chat_id: config.tg_chat_id, message_thread_id: topicId, text: tgMsg })
+                  });
               }
-              
-              await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/sendMessage`, {
-                  method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ chat_id: config.tg_chat_id, message_thread_id: topicId, text: tgMsg })
-              });
           }
 
           await env.db.prepare("INSERT INTO messages (user_id, sender, content) VALUES (?, 'user', ?)").bind(userId, content).run();
@@ -206,10 +216,10 @@ export default {
         /* ================= TG Webhook ================= */
         if (url.pathname === "/tg/webhook" && method === "POST") {
           const update = await request.json();
-          if (update.message && update.message.text) {
-            const text = update.message.text;
+          if (update.message && (update.message.text || update.message.photo)) {
+            const text = update.message.text || update.message.caption || "";
             const threadId = update.message.message_thread_id;
-            const replyTo = update.message.reply_to_message; 
+            const replyTo = update.message.reply_to_message;
             
             let targetUserId = null;
             let replyContent = text;
@@ -236,8 +246,23 @@ export default {
               }
             }
 
-            if (targetUserId && replyContent) {
-              await env.db.prepare("INSERT INTO messages (user_id, sender, content) VALUES (?, 'agent', ?)").bind(targetUserId, replyContent).run();
+            if (targetUserId) {
+              if (update.message.photo) {
+                const photoSize = update.message.photo[update.message.photo.length - 1];
+                const fileRes = await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/getFile?file_id=${photoSize.file_id}`).then(r => r.json());
+                if (fileRes.ok) {
+                  const imgRes = await fetch(`https://api.telegram.org/file/bot${config.tg_bot_token}/${fileRes.result.file_path}`);
+                  const arrayBuffer = await imgRes.arrayBuffer();
+                  let binary = '';
+                  const bytes = new Uint8Array(arrayBuffer);
+                  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+                  const mimeType = fileRes.result.file_path.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+                  await env.db.prepare("INSERT INTO messages (user_id, sender, content) VALUES (?, 'agent', ?)").bind(targetUserId, `data:${mimeType};base64,${btoa(binary)}`).run();
+                }
+              }
+              if (replyContent && replyContent.trim() !== "") {
+                await env.db.prepare("INSERT INTO messages (user_id, sender, content) VALUES (?, 'agent', ?)").bind(targetUserId, replyContent).run();
+              }
             }
           }
           return new Response("OK", { status: 200 });
