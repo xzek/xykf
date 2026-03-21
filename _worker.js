@@ -44,7 +44,9 @@ export default {
 
           if (url.pathname === "/api/admin/update-config" && method === "POST") {
             const reqData = await request.json();
-            const { username, password, botToken, chatId, agentIcon, userIcon, autoReply, quickReply, widgetTheme, faqList } = reqData;
+            const { username, password, botToken, chatId, agentIcon, userIcon, autoReply, quickReply, widgetTheme, faqList, imgStorage, r2Domain } = reqData;
+            if (imgStorage !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('img_storage', ?)").bind(imgStorage).run();
+            if (r2Domain !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('r2_domain', ?)").bind(r2Domain).run();
             if (widgetTheme !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('widget_theme', ?)").bind(widgetTheme).run();
             if (faqList !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('faq_list', ?)").bind(faqList).run();
             if (agentIcon !== undefined) await env.db.prepare("UPDATE config SET value = ? WHERE key = 'agent_icon'").bind(agentIcon).run();
@@ -145,12 +147,25 @@ export default {
                   const binaryStr = atob(base64Data);
                   const bytes = new Uint8Array(binaryStr.length);
                   for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+                  
                   const formData = new FormData();
                   formData.append("chat_id", config.tg_chat_id);
                   if (topicId) formData.append("message_thread_id", topicId);
                   formData.append("photo", new Blob([bytes], { type: mimeType }), "image.png");
                   if (!topicId) formData.append("caption", `客户ID:${userId} 发来图片：`);
-                  await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/sendPhoto`, { method: "POST", body: formData });
+                  const tgRes = await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/sendPhoto`, { method: "POST", body: formData }).then(r => r.json());
+                  
+                  let dbContent = content; // 默认 Base64
+                  if (config.img_storage === 'tg' && tgRes.ok && tgRes.result.photo) {
+                      const photoSize = tgRes.result.photo[tgRes.result.photo.length - 1];
+                      dbContent = `IMG:/api/image?tg=${photoSize.file_id}`;
+                  } else if (config.img_storage === 'r2' && env.R2) {
+                      const fileName = `img_${Date.now()}_${userId}.png`;
+                      await env.R2.put(fileName, bytes, { httpMetadata: { contentType: mimeType } });
+                      const r2Domain = config.r2_domain ? config.r2_domain.replace(/\/$/, '') : '';
+                      dbContent = `IMG:${r2Domain}/${fileName}`;
+                  }
+                  content = dbContent; // 更新存入数据库的真实内容
               } else {
                   let tgMsg = topicId ? content : `客户ID:${userId} 发来消息：\n${content}`;
                   await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/sendMessage`, {
@@ -213,6 +228,19 @@ export default {
           return new Response(JSON.stringify({ history: results }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
 
+        if (url.pathname === "/api/image" && method === "GET") {
+          const fileId = url.searchParams.get("tg");
+          if (!fileId) return new Response("Missing ID", { status: 400, headers: corsHeaders });
+          const fileRes = await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/getFile?file_id=${fileId}`).then(r => r.json());
+          if (fileRes.ok) {
+             const imgRes = await fetch(`https://api.telegram.org/file/bot${config.tg_bot_token}/${fileRes.result.file_path}`);
+             const headers = new Headers(imgRes.headers);
+             headers.set("Access-Control-Allow-Origin", "*");
+             return new Response(imgRes.body, { headers });
+          }
+          return new Response("Not found", { status: 404, headers: corsHeaders });
+        }
+
         /* ================= TG Webhook ================= */
         if (url.pathname === "/tg/webhook" && method === "POST") {
           const update = await request.json();
@@ -249,15 +277,26 @@ export default {
             if (targetUserId) {
               if (update.message.photo) {
                 const photoSize = update.message.photo[update.message.photo.length - 1];
-                const fileRes = await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/getFile?file_id=${photoSize.file_id}`).then(r => r.json());
-                if (fileRes.ok) {
-                  const imgRes = await fetch(`https://api.telegram.org/file/bot${config.tg_bot_token}/${fileRes.result.file_path}`);
-                  const arrayBuffer = await imgRes.arrayBuffer();
-                  let binary = '';
-                  const bytes = new Uint8Array(arrayBuffer);
-                  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-                  const mimeType = fileRes.result.file_path.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
-                  await env.db.prepare("INSERT INTO messages (user_id, sender, content) VALUES (?, 'agent', ?)").bind(targetUserId, `data:${mimeType};base64,${btoa(binary)}`).run();
+                if (config.img_storage === 'tg') {
+                  await env.db.prepare("INSERT INTO messages (user_id, sender, content) VALUES (?, 'agent', ?)").bind(targetUserId, `IMG:/api/image?tg=${photoSize.file_id}`).run();
+                } else {
+                  const fileRes = await fetch(`https://api.telegram.org/bot${config.tg_bot_token}/getFile?file_id=${photoSize.file_id}`).then(r => r.json());
+                  if (fileRes.ok) {
+                    const imgRes = await fetch(`https://api.telegram.org/file/bot${config.tg_bot_token}/${fileRes.result.file_path}`);
+                    const arrayBuffer = await imgRes.arrayBuffer();
+                    const mimeType = fileRes.result.file_path.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+                    if (config.img_storage === 'r2' && env.R2) {
+                        const fileName = `img_${Date.now()}_agent.png`;
+                        await env.R2.put(fileName, arrayBuffer, { httpMetadata: { contentType: mimeType } });
+                        const r2Domain = config.r2_domain ? config.r2_domain.replace(/\/$/, '') : '';
+                        await env.db.prepare("INSERT INTO messages (user_id, sender, content) VALUES (?, 'agent', ?)").bind(targetUserId, `IMG:${r2Domain}/${fileName}`).run();
+                    } else {
+                        let binary = '';
+                        const bytes = new Uint8Array(arrayBuffer);
+                        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+                        await env.db.prepare("INSERT INTO messages (user_id, sender, content) VALUES (?, 'agent', ?)").bind(targetUserId, `data:${mimeType};base64,${btoa(binary)}`).run();
+                    }
+                  }
                 }
               }
               if (replyContent && replyContent.trim() !== "") {
