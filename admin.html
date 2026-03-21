@@ -527,16 +527,20 @@
     }
     function getToken() { return localStorage.getItem("cs_admin_token"); }
     let adminConfig = { agent_icon: '', user_icon: '' };
-    
     window.onload = () => {
-        if (getToken()) {
-            document.getElementById('login-container').classList.add('hidden');
-            document.getElementById('admin-container').classList.remove('hidden');
-            apiFetch("/api/admin/config").then(d => adminConfig = d).catch(e=>{});
-            loadUsers();
-            pollInterval = setInterval(() => {
-                loadUsers(true); // 传入 true 表示后台定时刷新，检查新消息
-                pollCurrentChat();
+        function getToken() { return localStorage.getItem("cs_admin_token"); }
+    let adminConfig = { agent_icon: '', user_icon: '' };
+    if (getToken()) {
+        document.getElementById('login-container').classList.add('hidden');
+        document.getElementById('admin-container').classList.remove('hidden');
+        apiFetch("/api/admin/config").then(d => adminConfig = d).catch(e=>{});
+        loadUsers();
+        pollInterval = setInterval(() => {
+            loadUsers(true); // 传入 true 表示后台定时刷新，检查新消息
+            pollCurrentChat();
+        }, 3000);
+    }
+    async function apiFetch(path, options = {}) {
             }, 3000);
         }
     };
