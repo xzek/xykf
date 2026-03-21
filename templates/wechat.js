@@ -72,7 +72,19 @@
     let historyLoaded = false;
     let widgetConfig = { agent_icon: '', user_icon: '' };
     fetch(`${API_BASE}/api/customer/config`).then(r => r.json()).then(data => widgetConfig = data).catch(e => {});
-    function appendMsg(text, sender) {
+    
+    let lastMsgTime = 0;
+    function appendMsg(text, sender, timeStr) {
+        const d = timeStr ? new Date(timeStr.replace(' ', 'T') + 'Z') : new Date();
+        const nowTime = d.getTime();
+        if (nowTime - lastMsgTime > 5 * 60 * 1000) { // 超过5分钟显示时间
+            const timeDiv = document.createElement("div");
+            timeDiv.style.cssText = "text-align:center; font-size:12px; color:#999; margin:10px 0; width:100%; clear:both;";
+            timeDiv.innerText = d.toLocaleString('zh-CN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
+            chat.appendChild(timeDiv);
+            lastMsgTime = nowTime;
+        }
+
         const row = document.createElement("div");
         row.className = `cs-msg-row ${sender}`;
         
@@ -102,7 +114,8 @@
             const data = await res.json();
             if (data.history && data.history.length > 0) {
                 chat.innerHTML = '';
-                data.history.forEach(msg => appendMsg(msg.content, msg.sender));
+                lastMsgTime = 0; // 清空时重置时间计算
+                data.history.forEach(msg => appendMsg(msg.content, msg.sender, msg.created_at));
             }
             historyLoaded = true;
         } catch (e) { console.error("加载历史失败", e); }
@@ -118,7 +131,7 @@
                     if(res.ok) {
                         const data = await res.json();
                         if (data.replies && data.replies.length > 0) {
-                            data.replies.forEach(msg => appendMsg(msg.content, 'agent'));
+                            data.replies.forEach(msg => appendMsg(msg.content, 'agent', msg.created_at));
                             
                             // 尝试播放提示音 (浏览器策略要求用户必须先在页面有过点击交互才能播放声音)
                             try { notifySound.play(); } catch(e) {}
