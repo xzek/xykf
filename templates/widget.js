@@ -197,7 +197,7 @@
         msgDiv.className = `cs-msg ${sender}`;
         
         if (text.startsWith("data:image/")) {
-            msgDiv.innerHTML = `<img src="${text}" style="max-width: 100%; border-radius: 8px; cursor: pointer;" onclick="window.open('${text}')" />`;
+            msgDiv.innerHTML = `<img src="${text}" style="max-width: 100%; border-radius: 8px; cursor: pointer;" onclick="var w=window.open(''); w.document.write('<img src=&quot;${text}&quot; style=&quot;max-width:100%;&quot; />'); w.document.close();" />`;
             msgDiv.style.background = "transparent";
             msgDiv.style.padding = "0";
             msgDiv.style.boxShadow = "none";
