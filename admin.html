@@ -313,9 +313,8 @@
             avatar.className = "msg-avatar";
             const seed = m.sender === 'agent' ? 'kefu' : activeUserId;
             avatar.src = m.sender === 'agent' 
-                ? (adminConfig.agent_icon || 'https://api.dicebear.com/7.x/bottts/svg?seed=kefu') 
-                : (adminConfig.user_icon || `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`);
-
+                ? (adminConfig.agent_icon || `${API_BASE}/files/kfyj.webp`) 
+                : (adminConfig.user_icon || `${API_BASE}/files/khzb.webp?seed=${seed}`);
             // 2. 消息体容器 (包含时间和气泡)
             const wrapper = document.createElement("div");
             wrapper.className = "msg-wrapper";
