@@ -2,461 +2,591 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>在线客服管理后台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服工作台</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: #f0f2f5; display: flex; height: 100vh; }
-        * { outline: none !important; -webkit-tap-highlight-color: transparent !important; }
-        .hidden { display: none !important; }
-        
-        /* 登录页面样式 */
-        #login-container { width: 100%; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 320px; }
-        .login-box h2 { margin-top: 0; text-align: center; }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; font-weight: 500;}
-        .input-group input, .input-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; transition: border 0.3s; }
-        .input-group input:focus, .input-group textarea:focus { border-color: #1890ff; outline: none; }
-        .btn { width: 100%; padding: 10px; background: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-bottom: 10px; transition: background 0.3s;}
-        .btn:hover { background: #40a9ff; }
-        .btn.secondary { background: #fff; color: #666; border: 1px solid #d9d9d9; }
-        .btn.secondary:hover { background: #f5f5f5; color: #333; border-color: #ccc; }
-        
-        /* 后台主框架样式 */
-        #admin-container { width: 100%; display: flex; }
-        
-        /* 左侧边栏 */
-        #sidebar { width: 300px; background: white; border-right: 1px solid #e8e8e8; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; }
-        .sidebar-header button { display: flex; align-items: center; padding: 6px 12px; border-radius: 15px; transition: background 0.2s; }
-        .sidebar-header button:hover { background: #f0f5ff; }
-        .user-list { flex: 1; overflow-y: auto; }
-        .user-item { padding: 15px 20px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.2s; }
-        .user-item:hover, .user-item.active { background: #e6f7ff; border-right: 3px solid #1890ff; }
-        .user-id { font-weight: bold; margin-bottom: 5px; color: #333; }
-        .user-msg { font-size: 12px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* 右侧 - 聊天视图 */
-        #main-chat { flex: 1; display: flex; flex-direction: column; background: #f0f2f5; }
-        #chat-header { padding: 20px; background: white; border-bottom: 1px solid #e8e8e8; font-size: 18px; font-weight: bold; display: flex; align-items: center; }
-        #chat-window { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
-        .msg-row { display: flex; max-width: 75%; align-items: flex-start; margin-bottom: 15px; }
-        .msg-row:last-child { margin-bottom: 0; }
-        .msg-row .msg-avatar { margin-right: 10px; }
-        .msg-row.user { align-self: flex-start; }
-        .msg-row.agent { align-self: flex-end; flex-direction: row-reverse; }
-        .msg-row.agent .msg-avatar { margin-right: 0; margin-left: 10px; }
-        .msg-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; background: #fff; flex-shrink: 0; }
-        .msg-wrapper { display: flex; flex-direction: column; }
-        .msg-wrapper .msg-time { margin-bottom: 4px; }
-        .msg-row.agent .msg-wrapper { align-items: flex-end; }
-        .msg-time { font-size: 12px; color: #999; margin: 0 4px; }
-        .msg { padding: 10px 15px; border-radius: 8px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
-        .msg.user { background: white; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 4px; }
-        .msg.agent { background: #95ec69; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 4px; }
-        #chat-input-area { padding: 20px; background: white; border-top: 1px solid #e8e8e8; display: flex; }
-        #chat-input { flex: 1; margin-right: 10px; padding: 10px 15px; border: 1px solid #d9d9d9; border-radius: 4px; outline: none; font-size: 14px;}
-        #chat-input:focus { border-color: #1890ff; }
-        #send-btn { width: 100px; margin-bottom: 0; }
-
-        /* 右侧 - 设置视图 (独立页面) */
-        #settings-view { flex: 1; display: flex; flex-direction: column; background: #f0f2f5; }
-        #settings-header { padding: 20px; background: white; border-bottom: 1px solid #e8e8e8; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-        #settings-content { flex: 1; overflow-y: auto; padding: 30px; }
-        .settings-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
-       .settings-card h3 { margin-top: 0; margin-bottom: 20px; font-size: 16px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; color: #333; }
-        .settings-actions { display: flex; margin-top: 30px; }
-        .settings-actions button { margin-right: 15px; }
-        .settings-actions button:last-child { margin-right: 0; }
-        .settings-tabs { display: flex; border-bottom: 1px solid #e8e8e8; margin-bottom: 20px; }
-        .tab-btn { background: none; border: none; padding: 10px 20px; font-size: 15px; cursor: pointer; color: #666; border-bottom: 2px solid transparent; }
-        .tab-btn:hover { color: #1890ff; }
-        .tab-btn.active { color: #1890ff; border-bottom-color: #1890ff; font-weight: bold; }
-        .tab-pane { display: none; }
-        .tab-pane.active { display: block; }
-        @media (max-width: 768px) {
-            #admin-container { flex-direction: column; }
-            #sidebar { width: 100%; height: 100vh; }
-            #main-chat { width: 100%; height: 100vh; display: none; }
-            body.chat-active #sidebar { display: none; }
-            body.chat-active #main-chat { display: flex; }
-            .back-btn { display: inline-block; margin-right: 15px; font-size: 18px; cursor: pointer; color: #333; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        @media (min-width: 769px) { .back-btn { display: none; } }
+
+        /* 整个页面的背景，作为窗口后面的底色 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23e0e0e0"/></svg>');
+            background-color: #e0e0e0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 仿微信的主体窗口，固定尺寸并居中 */
+        .chat-container {
+            display: flex;
+            width: 1000px;
+            height: 700px;
+            max-width: 95vw;
+            max-height: 95vh;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        /* 左侧边栏 */
+        .sidebar {
+            width: 280px;
+            background-color: #e6e6e6;
+            border-right: 1px solid #d6d6d6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px 15px;
+            background-color: #e6e6e6;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .user-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .user-item:hover {
+            background-color: #d9d9d9;
+        }
+
+        .user-item.active {
+            background-color: #c6c6c6;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background-color: #1aad19;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .user-name span:first-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-last-msg {
+            font-size: 12px;
+            color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .unread-badge {
+            background-color: #f43530;
+            color: white;
+            border-radius: 10px;
+            padding: 0 5px;
+            font-size: 12px;
+            min-width: 18px;
+            text-align: center;
+            line-height: 18px;
+            height: 18px;
+        }
+
+        /* 右侧聊天区域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+            position: relative;
+        }
+
+        .header {
+            height: 60px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e7e7e7;
+            background-color: #f5f5f5;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .clear-btn {
+            padding: 5px 12px;
+            background-color: transparent;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .clear-btn:hover {
+            background-color: #e5e5e5;
+        }
+
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.received {
+            flex-direction: row;
+        }
+
+        .message.sent {
+            flex-direction: row-reverse;
+        }
+
+        /* 聊天气泡旁的头像 */
+        .msg-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .message.received .msg-avatar {
+            background-color: #ccc;
+            margin-right: 15px;
+        }
+
+        .message.sent .msg-avatar {
+            background-color: #1aad19;
+            margin-left: 15px;
+        }
+
+        .message-content {
+            max-width: 65%;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            word-break: break-all;
+        }
+
+        /* 收到的消息气泡 */
+        .message.received .message-content {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ededed;
+        }
+
+        .message.received .message-content::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 12px;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: 6px solid #ededed;
+        }
+
+        .message.received .message-content::after {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 12px;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: 6px solid #fff;
+        }
+
+        /* 发送的消息气泡 (微信绿) */
+        .message.sent .message-content {
+            background-color: #9eea6a;
+            color: #333;
+        }
+
+        .message.sent .message-content::before {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 12px;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 6px solid #9eea6a;
+        }
+
+        /* 底部输入区 */
+        .input-area {
+            height: 160px;
+            border-top: 1px solid #ececec;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            height: 40px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-box {
+            flex: 1;
+            padding: 0 20px;
+        }
+
+        .input-box textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            outline: none;
+            font-size: 14px;
+            font-family: inherit;
+            background: transparent;
+            color: #333;
+        }
+
+        .action-area {
+            height: 50px;
+            padding: 0 20px 15px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .send-btn {
+            padding: 6px 24px;
+            background-color: #e9e9e9;
+            border: 1px solid #e1e1e1;
+            border-radius: 4px;
+            color: #07c160;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background-color: #d2d2d2;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #c3c3c3;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+
+        /* 默认未选中用户时的遮罩 */
+        #emptyState {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        #emptyState.hidden {
+            display: none;
+        }
+        .icon-wechat-empty {
+            width: 100px;
+            height: 100px;
+            fill: #e0e0e0;
+        }
     </style>
 </head>
 <body>
-
-    <div id="login-container">
-        <div class="login-box">
-            <h2>客服控制台</h2>
-            <div class="input-group"><input type="text" id="username" placeholder="用户名 (默认 admin)"></div>
-            <div class="input-group"><input type="password" id="password" placeholder="密码 (默认 123456)"></div>
-            <button class="btn" onclick="login()">登录</button>
-        </div>
-    </div>
-
-    <div id="admin-container" class="hidden">
-        
-        <div id="sidebar">
+    <div class="chat-container">
+        <div class="sidebar">
             <div class="sidebar-header">
-                <b>客户列表</b>
-                <button onclick="showSettings()" style="cursor:pointer; border:none; background:none; color:#1890ff; font-weight:500;">
-                    ⚙️ 系统设置
-                </button>
+                <h2>客服会话列表</h2>
             </div>
-            <div class="user-list" id="user-list"></div>
+            <div class="user-list" id="userList">
+                </div>
         </div>
 
-        <div id="main-chat">
-            <div id="chat-header">请选择一个客户</div>
-            <div id="chat-window"></div>
-            <div id="chat-input-area" class="hidden">
-                <input type="text" id="chat-input" placeholder="输入回复内容，按回车发送...">
-                <button class="btn" id="send-btn" onclick="sendReply()">发送</button>
+        <div class="main-content">
+            <div id="emptyState">
+                <svg class="icon-wechat-empty" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M699.23 358.38c0-112.98-111.95-204.58-250.04-204.58-138.1 0-250.03 91.6-250.03 204.58 0 63.85 35.8 120.67 91.35 157.9l-28.73 85.3 100.94-51.04c27.15 7.64 56.12 11.85 86.47 11.85 138.08 0 250.04-91.6 250.04-204.01zM483.74 582.5c-20.08 0-39.5-2.22-58.12-6.33l-71.18 36.03 20.25-60.14C335.54 525.68 310.4 485.87 310.4 441.2c0-79.67 78.96-144.25 176.35-144.25 97.4 0 176.36 64.58 176.36 144.25 0 79.67-78.96 144.3-179.37 141.3z"/>
+                </svg>
             </div>
-        </div>
 
-        <div id="settings-view" class="hidden">
-            <div id="settings-header">
-                <span>系统设置</span>
-                <button onclick="closeSettings()" style="cursor:pointer; border:none; background:none; color:#999; font-size:16px;">✖ 返回聊天</button>
+            <div class="header">
+                <span id="currentUserName">请选择一个会话</span>
+                <button class="clear-btn" onclick="clearMessages()">清空记录</button>
             </div>
-            <div id="settings-content">
-            <div class="settings-card">
-                <div class="settings-tabs">
-                    <button class="tab-btn active" onclick="switchTab('tab-basic', this)">基础设置</button>
-                    <button class="tab-btn" onclick="switchTab('tab-function', this)">功能设置</button>
-                    <button class="tab-btn" onclick="switchTab('tab-reply', this)">回复功能</button>
-                    <button class="tab-btn" onclick="switchTab('tab-export', this)">导出/导入</button>
-                </div>
-                
-                <div id="tab-basic" class="tab-pane active">
-                <h3>🖥️ 网站接入</h3>
-                    <div class="input-group">
-                        <label>📌 网页插件引入代码 (复制并粘贴到你的网站 HTML 的 &lt;body&gt; 底部)</label>
-                        <textarea id="embed-code" rows="2" readonly style="font-family: monospace; font-size: 12px; background: #f9f9f9; resize: none;" onclick="this.select()"></textarea>
-                    </div>
-                    
-                    <h3 style="margin-top: 30px;">🔐 账号安全</h3>
-                    <div class="input-group">
-                        <label>修改账号 (留空不修改)</label>
-                        <input type="text" id="set-username" placeholder="输入新用户名">
-                    </div>
-                    <div class="input-group">
-                        <label>修改密码 (留空不修改)</label>
-                        <input type="password" id="set-password" placeholder="输入新密码">
-                    </div>
-                    
-                    <h3 style="margin-top: 30px;">🤖 Telegram 机器人推送</h3>
-                    <div class="input-group">
-                        <label>Telegram Bot Token (可选)</label>
-                        <input type="text" id="set-tg-token" placeholder="形如: 1234567:ABCDEFG...">
-                    </div>
-                    <div class="input-group">
-                    <label>Telegram 超级群聊 ID (可选)</label>
-                    <input type="text" id="set-tg-chatid" placeholder="形如: -1001234567">
-                </div>
-                <h3 style="margin-top: 30px;">🖼️ 图片存储模式</h3>
-                <div class="input-group">
-                    <label>图片存储位置</label>
-                    <select id="set-img-storage" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="base64">D1 数据库 (默认, 存Base64)</option>
-                        <option value="tg">Telegram 图床 (免费无限, 推荐)</option>
-                        <option value="r2">Cloudflare R2 (需绑定env.R2变量)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>R2 公开访问域名 (仅 R2 模式填写，带 https://)</label>
-                    <input type="text" id="set-r2-domain" placeholder="https://img.yourdomain.com">
-                </div>
-                </div> <div id="tab-function" class="tab-pane">
-                <h3>🎨 界面模板</h3>
-                <div class="input-group">
-                    <label>对话框风格</label>
-                    <select id="set-widget-theme" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; outline: none; margin-bottom: 15px;">
-                        <option value="widget">默认风格 (widget.js)</option>
-                        <option value="WeChat">微信风格 (WeChat.js)</option>
-                    </select>
-                </div>
-                <h3>🎨 图标设置</h3>
-                    <div class="input-group"><label>客服图标 URL</label><input type="text" id="set-agent-icon" placeholder="填入图片直链"></div>
-                    <div class="input-group"><label>客户图标 URL</label><input type="text" id="set-user-icon" placeholder="填入图片直链"></div>
+
+            <div class="messages" id="messageArea">
                 </div>
 
-                <div id="tab-reply" class="tab-pane">
-                    <h3>💬 自动回复与快捷回复</h3>
-                    <div class="input-group"><label>自动回复设置</label><textarea id="set-auto-reply" rows="3" placeholder="例如：你好，请问有什么可以帮您？"></textarea></div>
-                    <div class="input-group"><label>快捷回复 (每行一条)</label><textarea id="set-quick-reply" rows="4" placeholder="好的，请稍等。\n请提供您的订单号。"></textarea></div>
-                    <div class="input-group"><label>客户快捷提问 (格式：问题|自动回复内容，每行一条)</label><textarea id="set-faq-list" rows="4" placeholder="使用教程|请访问 xxx 获取教程&#10;人工服务|正在为您转接人工客服..."></textarea></div>
-                </div>
-
-                <div id="tab-export" class="tab-pane">
-                    <h3>📦 数据导出与导入</h3>
-                    <div style="margin-bottom: 20px;">
-                        <button class="btn secondary" style="width:auto; display:inline-block; margin-right:10px;" onclick="exportSettings()">导出基础设置</button>
-                        <button class="btn secondary" style="width:auto; display:inline-block;" onclick="exportChatHistory()">导出客户聊天记录</button>
+            <div class="input-area">
+                <div class="toolbar">
                     </div>
-                    <div class="input-group"><label>导入基础设置 (JSON格式)</label><textarea id="import-settings" rows="3" placeholder='粘贴导出的JSON配置'></textarea></div>
-                    <button class="btn secondary" style="width:auto;" onclick="importSettings()">执行导入</button>
+                <div class="input-box">
+                    <textarea id="messageInput" placeholder="输入消息... (按 Enter 发送)" onkeypress="handleKeyPress(event)"></textarea>
                 </div>
-
-                <div class="settings-actions">
-                        <button class="btn" onclick="updateSettings()">保存设置</button>
-                        <button class="btn secondary" onclick="closeSettings()">取消</button>
-                    </div>
+                <div class="action-area">
+                    <button class="send-btn" onclick="sendMessage()">发送(S)</button>
                 </div>
             </div>
         </div>
-
     </div>
 
-<script>
-    const API_BASE = ""; 
-    let activeUserId = null;
-    let pollInterval = null;
+    <audio id="notificationSound" src="/files/preview.mp3" preload="auto"></audio>
 
-    function getToken() { return localStorage.getItem("cs_admin_token"); }
-    let adminConfig = { agent_icon: '', user_icon: '' };
-    
-    window.onload = () => {
-        if (getToken()) {
-            document.getElementById('login-container').classList.add('hidden');
-            document.getElementById('admin-container').classList.remove('hidden');
-            // 获取设置中的自定义头像配置
-            apiFetch("/api/admin/config").then(d => adminConfig = d).catch(e=>{});
-            loadUsers();
-            pollInterval = setInterval(pollCurrentChat, 3000);
-        }
-    };
-    async function apiFetch(path, options = {}) {
-        const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${getToken()}` };
-        const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
-        if (res.status === 401) {
-            alert("登录已过期，请重新登录");
-            localStorage.removeItem("cs_admin_token");
-            location.reload();
-        }
-        return res.json();
-    }
+    <script>
+        // WebSocket 变量
+        let socket;
+        // 当前选中的用户 ID
+        let currentUserId = null;
+        // 用户列表数据
+        let users = [];
+        // 消息数据 { userId: [messages] }
+        let messages = {};
 
-    async function login() {
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('password').value;
-        const res = await fetch(`${API_BASE}/api/admin/login`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: u, password: p })
-        });
-        if (res.ok) {
-            const data = await res.json();
-            localStorage.setItem("cs_admin_token", data.token);
-            location.reload();
-        } else {
-            alert("账号或密码错误");
-        }
-    }
+        // 初始化 WebSocket 连接
+        function initWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            socket = new WebSocket(`${protocol}//${window.location.host}/ws/admin`);
 
-    async function loadUsers() {
-        const data = await apiFetch("/api/admin/users");
-        const listDiv = document.getElementById('user-list');
-        listDiv.innerHTML = "";
-        data.users.forEach(u => {
-            const div = document.createElement("div");
-            div.className = `user-item ${u.id == activeUserId ? 'active' : ''}`;
-            div.onclick = () => selectUser(u.id);
-            let displayMsg = u.last_message || '无消息';
-            if (displayMsg.startsWith("data:image/") || displayMsg.startsWith("IMG:")) displayMsg = "[图片]";
-            div.innerHTML = `<div class="user-id">客户 ${u.id}</div><div class="user-msg">${displayMsg}</div>`;
-            listDiv.appendChild(div);
-        });
-    }
+            socket.onopen = () => {
+                console.log('已连接到 WebSocket 服务器');
+            };
 
-    async function selectUser(userId) {
-        activeUserId = userId;
-        
-        // 点击客户时，确保隐藏设置界面，显示聊天界面
-        document.getElementById('settings-view').classList.add('hidden');
-        document.getElementById('main-chat').classList.remove('hidden');
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleMessage(data);
+            };
 
-        document.body.classList.add('chat-active');
-        document.getElementById('chat-header').innerHTML = `<span class="back-btn" onclick="backToList()">❮ 返回</span>正在与 <span style="color:#1890ff; margin-left:5px;">客户 ${userId}</span> 聊天`;
-        document.getElementById('chat-input-area').classList.remove('hidden');
-        
-        loadUsers(); // 刷新高亮状态
-        await pollCurrentChat();
-    }
-    function backToList() {
-        document.body.classList.remove('chat-active');
-    }
-
-    async function pollCurrentChat() {
-        if (!activeUserId) return;
-        
-        // 如果当前停留在设置页面，暂时不强制滚动或刷新聊天窗口，以免影响后台性能
-        if (!document.getElementById('settings-view').classList.contains('hidden')) {
-            return;
+            socket.onclose = () => {
+                console.log('与 WebSocket 服务器断开连接，3秒后重连...');
+                setTimeout(initWebSocket, 3000);
+            };
         }
 
-        const data = await apiFetch(`/api/admin/messages?userId=${activeUserId}`);
-        const win = document.getElementById('chat-window');
-        
-        // 简单的比对长度判断是否需要滚动 (防止用户在往上翻看聊天记录时被强制拉到底部)
-        const isScrolledToBottom = win.scrollHeight - win.clientHeight <= win.scrollTop + 10;
-        
-        win.innerHTML = "";
-        data.messages.forEach(m => {
-            const row = document.createElement("div");
-            row.className = `msg-row ${m.sender}`;
-            
-            // 1. 生成头像
-            const avatar = document.createElement("img");
-            avatar.className = "msg-avatar";
-            const seed = m.sender === 'agent' ? 'kefu' : activeUserId;
-            avatar.src = m.sender === 'agent' 
-                ? (adminConfig.agent_icon || `${API_BASE}/files/kfyj.webp`) 
-                : (adminConfig.user_icon || `${API_BASE}/files/khzb.webp?seed=${seed}`);
-            // 2. 消息体容器 (包含时间和气泡)
-            const wrapper = document.createElement("div");
-            wrapper.className = "msg-wrapper";
+        // 播放提示音
+        function playNotificationSound() {
+            const audio = document.getElementById('notificationSound');
+            audio.play().catch(error => console.error("无法播放提示音", error));
+        }
 
-            // 3. 生成日期时间 (D1默认存储UTC，转换为带Z的格式确保被解析为本地时区)
-            const timeDiv = document.createElement("div");
-            timeDiv.className = "msg-time";
-            const d = new Date(m.created_at.replace(' ', 'T') + 'Z');
-            timeDiv.innerText = d.toLocaleString('zh-CN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
-
-            // 4. 生成聊天气泡
-            const bubble = document.createElement("div");
-            bubble.className = `msg ${m.sender}`;
-            
-            if (m.content.startsWith("data:image/") || m.content.startsWith("IMG:")) {
-                const imgSrc = m.content.startsWith("IMG:") ? m.content.substring(4) : m.content;
-                bubble.innerHTML = `<img src="${imgSrc}" style="max-width: 200px; border-radius: 4px; cursor: pointer;" onclick="var w=window.open(''); w.document.write('<img src=&quot;${imgSrc}&quot; style=&quot;max-width:100%;&quot; />'); w.document.close();" />`;
-                bubble.style.background = "transparent";
-                bubble.style.padding = "0";
-                bubble.style.boxShadow = "none";
-            } else {
-                if (m.sender === 'agent') {
-                    bubble.innerHTML = m.content; // 客服的消息渲染HTML
-                } else {
-                    bubble.innerText = m.content; // 客户的消息强制当成纯文本
+        // 处理接收到的消息
+        function handleMessage(data) {
+            if (data.type === 'init') {
+                users = data.users;
+                renderUserList();
+            } else if (data.type === 'user_connected') {
+                if (!users.find(u => u.id === data.userId)) {
+                    users.push({ id: data.userId, unread: 0 });
                 }
+                renderUserList();
+            } else if (data.type === 'user_disconnected') {
+                // 可选：在界面上标记用户离线
+            } else if (data.type === 'message') {
+                const userId = data.userId;
+                if (!messages[userId]) {
+                    messages[userId] = [];
+                }
+                messages[userId].push(data);
+
+                // 如果当前选中的是该用户，则更新消息列表
+                if (currentUserId === userId) {
+                    renderMessages();
+                    scrollToBottom();
+                } else {
+                    // 否则增加未读数
+                    const user = users.find(u => u.id === userId);
+                    if (user) {
+                        user.unread = (user.unread || 0) + 1;
+                        renderUserList();
+                    }
+                }
+                playNotificationSound();
             }
-
-            // 5. 组合拼装
-            wrapper.appendChild(timeDiv);
-            wrapper.appendChild(bubble);
-            row.appendChild(avatar);
-            row.appendChild(wrapper);
-            win.appendChild(row);
-        });
-        if (isScrolledToBottom) {
-            win.scrollTop = win.scrollHeight;
         }
-    }
 
-    async function sendReply() {
-        const input = document.getElementById('chat-input');
-        const text = input.value.trim();
-        if (!text || !activeUserId) return;
-        input.value = "";
-        await apiFetch("/api/admin/reply", { method: "POST", body: JSON.stringify({ userId: activeUserId, content: text }) });
-        pollCurrentChat();
-    }
+        // 渲染用户列表
+        function renderUserList() {
+            const userListEl = document.getElementById('userList');
+            userListEl.innerHTML = '';
 
-    document.getElementById('chat-input').onkeypress = (e) => { if (e.key === 'Enter') sendReply(); };
+            users.forEach(user => {
+                const lastMsg = messages[user.id] && messages[user.id].length > 0
+                    ? messages[user.id][messages[user.id].length - 1].content
+                    : '新会话';
 
-    // ======= 新的系统设置展示与隐藏逻辑 =======
-    async function showSettings() { 
-        // 隐藏聊天主界面，显示设置独立页面
-        document.getElementById('main-chat').classList.add('hidden');
-        document.getElementById('settings-view').classList.remove('hidden'); 
-        
-        const currentDomain = window.location.origin;
-        document.getElementById('embed-code').value = `<script src="${currentDomain}/widget.js"><\/script>`;
-        
-        // 拉取配置填充
-        const data = await apiFetch("/api/admin/config");
-        document.getElementById('set-tg-token').value = data.tg_bot_token || "";
-        document.getElementById('set-tg-chatid').value = data.tg_chat_id || "";
-        document.getElementById('set-img-storage').value = data.img_storage || "base64";
-        document.getElementById('set-r2-domain').value = data.r2_domain || "";
-        document.getElementById('set-widget-theme').value = data.widget_theme || "widget";
-        document.getElementById('set-agent-icon').value = data.agent_icon || "";
-        document.getElementById('set-user-icon').value = data.user_icon || "";
-        document.getElementById('set-auto-reply').value = data.auto_reply || "";
-        document.getElementById('set-quick-reply').value = data.quick_reply || "";
-        document.getElementById('set-faq-list').value = data.faq_list || "";
-    }
-    
-    function closeSettings() { 
-        // 隐藏设置独立页面，恢复聊天主界面
-        document.getElementById('settings-view').classList.add('hidden');
-        document.getElementById('main-chat').classList.remove('hidden');
-    }
+                const el = document.createElement('div');
+                el.className = `user-item ${currentUserId === user.id ? 'active' : ''}`;
+                el.onclick = () => selectUser(user.id);
+                
+                // 简单的头像占位符
+                const initial = user.id.substring(0, 1).toUpperCase();
 
-    // 切换选项卡功能
-    function switchTab(tabId, btn) {
-        document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        btn.classList.add('active');
-    }
-    async function exportSettings() {
-        const data = await apiFetch("/api/admin/config");
-        const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = 'kf_settings.json'; a.click();
-    }
-
-    async function exportChatHistory() {
-        const data = await apiFetch("/api/admin/export-messages");
-        const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = 'kf_messages.json'; a.click();
-    }
-
-    async function importSettings() {
-        const val = document.getElementById('import-settings').value;
-        if (!val) return alert("请先粘贴 JSON 内容");
-        try {
-            await apiFetch("/api/admin/import-config", { method: "POST", body: JSON.stringify(JSON.parse(val)) });
-            alert("导入成功！");
-            location.reload();
-        } catch(e) { alert("JSON 格式错误或导入失败"); }
-    }
-    async function updateSettings() {
-        const u = document.getElementById('set-username').value;
-        const p = document.getElementById('set-password').value;
-        const bt = document.getElementById('set-tg-token').value;
-        const ci = document.getElementById('set-tg-chatid').value;
-        
-        const payload = { 
-            botToken: bt, 
-            chatId: ci,
-            imgStorage: document.getElementById('set-img-storage').value,
-            r2Domain: document.getElementById('set-r2-domain').value,
-            widgetTheme: document.getElementById('set-widget-theme').value,
-            agentIcon: document.getElementById('set-agent-icon').value,
-            userIcon: document.getElementById('set-user-icon').value,
-            autoReply: document.getElementById('set-auto-reply').value,
-            quickReply: document.getElementById('set-quick-reply').value,
-            faqList: document.getElementById('set-faq-list').value
-        };
-        if (u) payload.username = u;
-        if (p) payload.password = p;
-
-        await apiFetch("/api/admin/update-config", { method: "POST", body: JSON.stringify(payload) });
-        
-        alert("设置保存成功！");
-        if (p || u) {
-            alert("账号或密码已修改，请重新登录。");
-            localStorage.removeItem("cs_admin_token");
-            location.reload();
-        } else {
-            closeSettings();
+                el.innerHTML = `
+                    <div class="user-avatar">${initial}</div>
+                    <div class="user-info">
+                        <div class="user-name">
+                            <span>客户 ${user.id.substring(0, 6)}...</span>
+                            ${user.unread ? `<span class="unread-badge">${user.unread}</span>` : ''}
+                        </div>
+                        <div class="user-last-msg">${lastMsg}</div>
+                    </div>
+                `;
+                userListEl.appendChild(el);
+            });
         }
-    }
-</script>
+
+        // 选择用户
+        function selectUser(userId) {
+            currentUserId = userId;
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.unread = 0;
+            }
+            
+            // 隐藏空白提示页
+            document.getElementById('emptyState').classList.add('hidden');
+            
+            document.getElementById('currentUserName').innerText = `客户 ${userId}`;
+            renderUserList();
+            renderMessages();
+            scrollToBottom();
+            document.getElementById('messageInput').focus();
+        }
+
+        // 渲染消息列表
+        function renderMessages() {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = '';
+
+            if (currentUserId && messages[currentUserId]) {
+                messages[currentUserId].forEach(msg => {
+                    const isAdmin = msg.role === 'admin';
+                    const el = document.createElement('div');
+                    el.className = `message ${isAdmin ? 'sent' : 'received'}`;
+                    
+                    // 为聊天内容添加头像
+                    const avatarStr = isAdmin ? '我' : '客';
+                    el.innerHTML = `
+                        <div class="msg-avatar">${avatarStr}</div>
+                        <div class="message-content">${msg.content}</div>
+                    `;
+                    messageArea.appendChild(el);
+                });
+            }
+        }
+
+        // 滚动到底部
+        function scrollToBottom() {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.scrollTop = messageArea.scrollHeight;
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+
+            if (!content || !currentUserId) return;
+
+            const msgData = {
+                type: 'message',
+                userId: currentUserId,
+                content: content,
+                role: 'admin'
+            };
+
+            // 发送给服务器
+            socket.send(JSON.stringify(msgData));
+
+            // 本地展示
+            if (!messages[currentUserId]) {
+                messages[currentUserId] = [];
+            }
+            messages[currentUserId].push(msgData);
+
+            input.value = '';
+            renderMessages();
+            scrollToBottom();
+            renderUserList(); // 更新最后一条消息的预览
+        }
+
+        // 清空当前用户的消息记录
+        function clearMessages() {
+            if (currentUserId && confirm('确定要清空与该客户的聊天记录吗？')) {
+                messages[currentUserId] = [];
+                renderMessages();
+            }
+        }
+
+        // 回车发送消息
+        function handleKeyPress(event) {
+            // Enter 发送, Shift+Enter 换行
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // 页面加载时初始化
+        window.onload = initWebSocket;
+    </script>
 </body>
 </html>
