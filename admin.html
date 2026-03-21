@@ -251,7 +251,9 @@
             const div = document.createElement("div");
             div.className = `user-item ${u.id == activeUserId ? 'active' : ''}`;
             div.onclick = () => selectUser(u.id);
-            div.innerHTML = `<div class="user-id">客户 ${u.id}</div><div class="user-msg">${u.last_message || '无消息'}</div>`;
+            let displayMsg = u.last_message || '无消息';
+            if (displayMsg.startsWith("data:image/")) displayMsg = "[图片]";
+            div.innerHTML = `<div class="user-id">客户 ${u.id}</div><div class="user-msg">${displayMsg}</div>`;
             listDiv.appendChild(div);
         });
     }
