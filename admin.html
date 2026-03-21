@@ -499,6 +499,9 @@
     let userLastMsgs = {}; 
     let unreadCounts = {};
     const notifySound = new Audio(`${API_BASE}/files/preview.mp3`); // 播放现有的提示音
+    // 性能优化：用于增量渲染，防止每次全量清空重绘导致卡顿
+    let renderedMsgCount = 0; 
+    let chatLastMsgTime = 0;
     // 格式化时间
     function formatTime(timestamp) {
         const date = new Date(timestamp);
@@ -587,7 +590,8 @@
         if (hasNewMessage && isPolling) {
             notifySound.play().catch(e => {}); // 防止浏览器策略拦截报错
         }
-
+        // 性能优化：如果是定时器轮询且没有新消息，直接跳过左侧列表重绘，极大减轻浏览器压力！
+        if (isPolling && !hasNewMessage) return;
         // 3. 排序：未读消息越多的排在越前面
         data.users.sort((a, b) => (unreadCounts[b.id] || 0) - (unreadCounts[a.id] || 0));
         
@@ -622,7 +626,6 @@
             `;
             listDiv.appendChild(div);
         });
-
         // 恢复滚动条
         if (isPolling) listDiv.scrollTop = scrollPos;
     }
@@ -630,12 +633,14 @@
     async function selectUser(userId) {
         activeUserId = userId;
         unreadCounts[userId] = 0; // 点击后清空该客户的未读数量
+        // 性能优化：切换客户时，重置渲染计数器，并手动清空当前窗口
+        renderedMsgCount = 0;
+        chatLastMsgTime = 0;
+        document.getElementById('chat-window').innerHTML = "";
         document.getElementById('emptyState').classList.add('hidden');
         document.getElementById('settings-view').classList.add('hidden');
         document.getElementById('main-chat').classList.remove('hidden');
-
-        document.getElementById('chat-header').innerText = `客户 ${userId}`;
-        
+        document.getElementById('chat-header').innerText = `客户 ${userId}`;        
         loadUsers(); 
         await pollCurrentChat();
     }
@@ -643,18 +648,17 @@
     async function pollCurrentChat() {
         if (!activeUserId) return;
         if (!document.getElementById('settings-view').classList.contains('hidden')) return;
-
         const data = await apiFetch(`/api/admin/messages?userId=${activeUserId}`);
         const win = document.getElementById('chat-window');
-        
+        // 性能优化：如果获取到的消息数量和已经渲染的数量一样，直接跳过！不重绘！
+        if (data.messages.length === renderedMsgCount) return;
         const isScrolledToBottom = win.scrollHeight - win.clientHeight <= win.scrollTop + 10;
-        
-        win.innerHTML = "";
-        let lastMsgTime = 0;
-
-        data.messages.forEach(m => {
+        // 提取新增加的消息
+        const newMessages = data.messages.slice(renderedMsgCount);
+        newMessages.forEach(m => {
             const msgTimestamp = new Date(m.created_at.replace(' ', 'T') + 'Z').getTime();
-
+            // 如果与上一条消息间隔超过5分钟(300000毫秒)，则显示时间标签
+            if (msgTimestamp - chatLastMsgTime > 300000) {
             // 如果与上一条消息间隔超过5分钟(300000毫秒)，则显示时间标签
             if (msgTimestamp - lastMsgTime > 300000) {
                 const timeDiv = document.createElement("div");
@@ -664,8 +668,7 @@
                 lastMsgTime = msgTimestamp;
             }
             const row = document.createElement("div");
-            row.className = `msg-row ${m.sender}`;
-            
+            row.className = `msg-row ${m.sender}`;      
             const avatar = document.createElement("div");
             avatar.className = "msg-avatar";
             const seed = m.sender === 'agent' ? 'kefu' : activeUserId;
@@ -673,15 +676,11 @@
                 ? (adminConfig.agent_icon || `${API_BASE}/files/kfyj.webp`) 
                 : (adminConfig.user_icon || `${API_BASE}/files/khzb.webp?seed=${seed}`);
             avatar.innerHTML = `<img src="${imgSrc}" onerror="this.style.display='none'">`;
-
             const wrapper = document.createElement("div");
             wrapper.className = "msg-wrapper";
-
-            const d = new Date(m.created_at.replace(' ', 'T') + 'Z');
-            
+            const d = new Date(m.created_at.replace(' ', 'T') + 'Z');    
             const contentDiv = document.createElement("div");
-            contentDiv.className = "msg-content";
-            
+            contentDiv.className = "msg-content";    
             if (m.content.startsWith("data:image/") || m.content.startsWith("IMG:")) {
                 const imgUrl = m.content.startsWith("IMG:") ? m.content.substring(4) : m.content;
                 contentDiv.innerHTML = `<img src="${imgUrl}" style="max-width: 200px; border-radius: 4px; cursor: pointer;" onclick="window.open('${imgUrl}')" />`;
@@ -702,6 +701,7 @@
             row.appendChild(wrapper);
             win.appendChild(row);
         });
+        renderedMsgCount = data.messages.length;
         if (isScrolledToBottom) {
             win.scrollTop = win.scrollHeight;
         }
