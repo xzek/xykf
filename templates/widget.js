@@ -117,7 +117,7 @@
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M 15 50 A 35 35 0 1 1 61.5 83" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"></path><rect x="7" y="36" width="16" height="28" rx="88" fill="#FFFFFF"></rect><rect x="77" y="36" width="16" height="28" rx="88" fill="#FFFFFF"></rect><rect x="42" y="78" width="22" height="10" rx="88" fill="#FFFFFF"></rect><path fill-rule="evenodd" clip-rule="evenodd" d="M 50 25 A 25 25 0 1 1 43 74 L 32 83 L 31 66.2 A 25 25 0 0 1 50 25 Z M 34 44.5 A 5.5 5.5 0 1 1 34 55.5 A 5.5 5.5 0 1 1 34 44.5 Z M 50 44.5 A 5.5 5.5 0 1 1 50 55.5 A 5.5 5.5 0 1 1 50 44.5 Z M 66 44.5 A 5.5 5.5 0 1 1 66 55.5 A 5.5 5.5 0 1 1 66 44.5 Z" fill="#FFFFFF"></path></svg>
             <span id="cs-unread">0</span>
         </button>
-        <audio id="cs-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+        <audio id="cs-sound" src="${API_BASE}/files/preview.mp3" preload="auto"></audio>
     `;
     const container = document.createElement('div');
     container.id = 'cs-widget';
@@ -173,9 +173,9 @@
         avatar.className = "cs-avatar";
         const seed = sender === 'agent' ? 'kefu' : (userId || Math.random());
         if (sender === 'agent') {
-            avatar.src = widgetConfig.agent_icon || 'https://api.dicebear.com/7.x/bottts/svg?seed=kefu';
+            avatar.src = widgetConfig.agent_icon || '${API_BASE}/files/kfyj.webp';
         } else {
-            avatar.src = widgetConfig.user_icon || `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`;
+            avatar.src = widgetConfig.user_icon || `${API_BASE}/files/khzb.webp?seed=${seed}`;
         }
         
         const msgDiv = document.createElement("div");
