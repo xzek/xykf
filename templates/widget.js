@@ -55,9 +55,9 @@
         .cs-msg.user { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px 16px 4px 16px; }
         
         /* 快捷提问区 */
-        #cs-faq-area { padding: 12px 16px 0; background: #f8f9fa; display: flex; overflow-x: auto; white-space: nowrap; border-top: 1px solid #f0f0f0; }
+        #cs-faq-area { padding: 6px 6px 0; background: #f8f9fa; display: flex; overflow-x: auto; white-space: nowrap; }
         #cs-faq-area::-webkit-scrollbar { display: none; }
-        .cs-faq-btn { background: white; border: 1px solid #e4e4e4; border-radius: 16px; padding: 6px 14px; font-size: 13px; color: #555; cursor: pointer; margin-right: 8px; flex-shrink: 0; transition: all 0.2s; }
+        .cs-faq-btn { background: white; border: 1px solid #e4e4e4; border-radius: 16px; padding: 5px 6px; font-size: 13px; color: #555; cursor: pointer; margin-right: 8px; flex-shrink: 0; transition: all 0.2s; }
         .cs-faq-btn:hover { border-color: #764ba2; color: #764ba2; }
         
         /* 输入区 */
