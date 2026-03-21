@@ -332,7 +332,7 @@
             
             if (m.content.startsWith("data:image/") || m.content.startsWith("IMG:")) {
                 const imgSrc = m.content.startsWith("IMG:") ? m.content.substring(4) : m.content;
-                bubble.innerHTML = `<img src="${imgSrc}" style="max-width: 200px; border-radius: 4px; cursor: pointer;" onclick="window.open('${imgSrc}')" />`;
+                bubble.innerHTML = `<img src="${imgSrc}" style="max-width: 200px; border-radius: 4px; cursor: pointer;" onclick="var w=window.open(''); w.document.write('<img src=&quot;${imgSrc}&quot; style=&quot;max-width:100%;&quot; />'); w.document.close();" />`;
                 bubble.style.background = "transparent";
                 bubble.style.padding = "0";
                 bubble.style.boxShadow = "none";
