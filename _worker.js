@@ -185,9 +185,9 @@ export default {
                   if (config.img_storage === 'tg' && tgRes.ok && tgRes.result.photo) {
                       const photoSize = tgRes.result.photo[tgRes.result.photo.length - 1];
                       dbContent = `IMG:/api/image?tg=${photoSize.file_id}`;
-                  } else if (config.img_storage === 'r2' && env.R2) {
+                  } else if (config.img_storage === 'r2' && env.r2) {
                       const fileName = `img_${Date.now()}_${userId}.png`;
-                      await env.R2.put(fileName, bytes, { httpMetadata: { contentType: mimeType } });
+                      await env.r2.put(fileName, bytes, { httpMetadata: { contentType: mimeType } });
                       const r2Domain = config.r2_domain ? config.r2_domain.replace(/\/$/, '') : '';
                       dbContent = `IMG:${r2Domain}/${fileName}`;
                   }
@@ -311,9 +311,9 @@ export default {
                     const imgRes = await fetch(`https://api.telegram.org/file/bot${config.tg_bot_token}/${fileRes.result.file_path}`);
                     const arrayBuffer = await imgRes.arrayBuffer();
                     const mimeType = fileRes.result.file_path.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
-                    if (config.img_storage === 'r2' && env.R2) {
+                    if (config.img_storage === 'r2' && env.r2) {
                         const fileName = `img_${Date.now()}_agent.png`;
-                        await env.R2.put(fileName, arrayBuffer, { httpMetadata: { contentType: mimeType } });
+                        await env.r2.put(fileName, arrayBuffer, { httpMetadata: { contentType: mimeType } });
                         const r2Domain = config.r2_domain ? config.r2_domain.replace(/\/$/, '') : '';
                         await env.db.prepare("INSERT INTO messages (user_id, sender, content) VALUES (?, 'agent', ?)").bind(targetUserId, `IMG:${r2Domain}/${fileName}`).run();
                     } else {
