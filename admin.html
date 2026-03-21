@@ -527,9 +527,6 @@
     }
     function getToken() { return localStorage.getItem("cs_admin_token"); }
     let adminConfig = { agent_icon: '', user_icon: '' };
-    window.onload = () => {
-        function getToken() { return localStorage.getItem("cs_admin_token"); }
-    let adminConfig = { agent_icon: '', user_icon: '' };
     if (getToken()) {
         document.getElementById('login-container').classList.add('hidden');
         document.getElementById('admin-container').classList.remove('hidden');
@@ -540,11 +537,6 @@
             pollCurrentChat();
         }, 3000);
     }
-    async function apiFetch(path, options = {}) {
-            }, 3000);
-        }
-    };
-
     async function apiFetch(path, options = {}) {
         const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${getToken()}` };
         const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
