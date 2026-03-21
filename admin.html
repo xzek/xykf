@@ -488,7 +488,29 @@
     const API_BASE = ""; 
     let activeUserId = null;
     let pollInterval = null;
-
+    // 格式化时间
+    function formatTime(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const msgDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const timeStr = `${hours}:${minutes}`;
+        
+        const diffDays = Math.floor((today - msgDate) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 0) {
+            return timeStr;
+        } else if (diffDays === 1) {
+            return `昨天 ${timeStr}`;
+        } else {
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${month}-${day} ${timeStr}`;
+        }
+    }
     function getToken() { return localStorage.getItem("cs_admin_token"); }
     let adminConfig = { agent_icon: '', user_icon: '' };
     
@@ -579,7 +601,19 @@
         const isScrolledToBottom = win.scrollHeight - win.clientHeight <= win.scrollTop + 10;
         
         win.innerHTML = "";
+        let lastMsgTime = 0;
+
         data.messages.forEach(m => {
+            const msgTimestamp = new Date(m.created_at.replace(' ', 'T') + 'Z').getTime();
+
+            // 如果与上一条消息间隔超过5分钟(300000毫秒)，则显示时间标签
+            if (msgTimestamp - lastMsgTime > 300000) {
+                const timeDiv = document.createElement("div");
+                timeDiv.style.cssText = 'text-align: center; font-size: 12px; color: #b2b2b2; margin: 15px 0 10px 0; clear: both; width: 100%;';
+                timeDiv.innerText = formatTime(msgTimestamp);
+                win.appendChild(timeDiv);
+                lastMsgTime = msgTimestamp;
+            }
             const row = document.createElement("div");
             row.className = `msg-row ${m.sender}`;
             
