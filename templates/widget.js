@@ -175,7 +175,7 @@
         const nowTime = d.getTime();
         if (nowTime - lastMsgTime > 5 * 60 * 1000) { // 超过5分钟显示时间
             const timeDiv = document.createElement("div");
-            timeDiv.style.cssText = "text-align:center; font-size:12px; color:#999; margin:8px 0 12px; width:100%; clear:both;";
+            timeDiv.style.cssText = "text-align:center; font-size:12px; color:#999; margin:0px 0 6px; width:100%; clear:both;";
             timeDiv.innerText = d.toLocaleString('zh-CN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
             chat.appendChild(timeDiv);
             lastMsgTime = nowTime;
