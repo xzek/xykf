@@ -152,6 +152,16 @@
     let widgetConfig = { agent_icon: '', user_icon: '' };
     fetch(`${API_BASE}/api/customer/config`).then(r => r.json()).then(data => {
         widgetConfig = data;
+        const dynamicStyle = document.createElement('style');
+        dynamicStyle.innerHTML = `
+            #cs-widget { ${data.pc_icon_pos || 'bottom: 80px; right: 24px;'} }
+            #cs-toggle { width: ${data.pc_icon_size || '58px'}; height: ${data.pc_icon_size || '58px'}; }
+            @media (max-width: 480px) {
+                #cs-widget { ${data.mobile_icon_pos || 'bottom: 20px; right: 20px;'} transform: none !important; }
+                #cs-toggle { width: ${data.mobile_icon_size || '48px'}; height: ${data.mobile_icon_size || '48px'}; }
+            }
+        `;
+        document.head.appendChild(dynamicStyle);
         if (data.faq_list) {
             const faqArea = document.getElementById("cs-faq-area");
             const lines = data.faq_list.split('\n').filter(l => l.includes('|'));
