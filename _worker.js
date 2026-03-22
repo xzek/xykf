@@ -94,20 +94,26 @@ export default {
             let { userId, content } = await request.json();
             let tgText = `[网页后台回复]:\n${content}`;
 
-            // 新增逻辑：检查后台发送的是否为图片
-            if (content.startsWith("data:image/")) {
-                const base64Data = content.split(',')[1];
-                const mimeType = content.split(';')[0].split(':')[1];
+            // 1. 去除前端传来的 IMG: 前缀，提取真正的 Base64
+            let checkContent = content.startsWith("IMG:") ? content.substring(4) : content;
+
+            // 2. 检查剥离前缀后，是否为真正的 Base64 图片
+            if (checkContent.startsWith("data:image/")) {
+                const base64Data = checkContent.split(',')[1];
+                const mimeType = checkContent.split(';')[0].split(':')[1];
                 const binaryStr = atob(base64Data);
                 const bytes = new Uint8Array(binaryStr.length);
                 for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
                 
-                // 检查是否配置了 R2 并上传
+                // 3. 检查是否配置了 R2 并上传
                 if (config.img_storage === 'r2' && env.r2) {
                     const fileName = `img_${Date.now()}_agent.png`;
                     await env.r2.put(fileName, bytes, { httpMetadata: { contentType: mimeType } });
                     const r2Domain = config.r2_domain ? config.r2_domain.replace(/\/$/, '') : '';
                     content = `IMG:${r2Domain}/${fileName}`;
+                } else {
+                    // 如果没有配 R2，确保还原回带前缀的格式存入D1，以便前端正确渲染
+                    content = `IMG:${checkContent}`; 
                 }
                 tgText = `[网页后台回复了一张图片]`; // 避免把长串Base64代码发给TG导致卡顿
             }
