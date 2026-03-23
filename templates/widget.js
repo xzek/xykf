@@ -36,7 +36,7 @@
         #cs-close svg { width: 14px; height: 14px; fill: white; }
         
         /* 聊天内容区 */
-        #cs-chat { flex: 1; padding: 16px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; }
+        #cs-chat { flex: 1; padding: 10px; overflow-y: auto; background: #f8f9fa; display: flex; flex-direction: column; }
         #cs-chat::-webkit-scrollbar { width: 6px; }
         #cs-chat::-webkit-scrollbar-track { background: transparent; }
         #cs-chat::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 3px; }
@@ -77,7 +77,6 @@
         @media (max-width: 400px) { 
             #cs-widget { transform-origin: bottom right; transform: scale(0.8); } 
             .cs-msg, #cs-input { font-size: 16px; } 
-            #cs-chat { gap: 20px; } 
         }
         @media (max-width: 350px) { 
             #cs-widget { transform-origin: bottom right; transform: scale(0.7); } 
