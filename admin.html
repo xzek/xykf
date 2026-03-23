@@ -353,7 +353,7 @@
     <div id="admin-container" class="chat-container hidden">
         
         <div class="nav-sidebar">
-            <div class="nav-avatar"></div>
+            <div class="nav-avatar" id="nav-avatar"></div>
             <svg class="nav-icon active" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" onclick="closeSettings()"><path d="M512 128c-203.2 0-368 141.1-368 315.2 0 98.7 51.5 186.7 132.8 243.6L240 848l112.9-56.1c48.6 17.5 101.9 27.3 159.1 27.3 203.2 0 368-141.1 368-315.2S715.2 128 512 128z"/></svg>
             
             <div class="nav-bottom">
@@ -384,11 +384,7 @@
             <div id="main-chat" class="hidden">
                 <div class="header">
                     <div class="header-title" id="chat-header">请选择一个客户</div>
-                    <div class="window-controls">
-                        <span>─</span>
-                        <span>□</span>
-                        <span>✕</span>
-                    </div>
+                    <div class="window-controls" id="current-date-time" style="font-size: 14px; cursor: default; color: #888;"></div>
                 </div>
 
                 <div class="messages" id="chat-window"></div>
@@ -537,7 +533,10 @@
     if (getToken()) {
         document.getElementById('login-container').classList.add('hidden');
         document.getElementById('admin-container').classList.remove('hidden');
-        apiFetch("/api/admin/config").then(d => adminConfig = d).catch(e=>{});
+        apiFetch("/api/admin/config").then(d => {
+            adminConfig = d;
+            document.getElementById('nav-avatar').style.backgroundImage = `url(${adminConfig.agent_icon || `${API_BASE}/files/kfyj.webp`})`;
+        }).catch(e=>{});
         loadUsers();
         pollInterval = setInterval(() => {
             loadUsers(true); // 传入 true 表示后台定时刷新，检查新消息
@@ -937,6 +936,18 @@
             }
         }
     });
+    // 实时更新右上角日期时间
+    setInterval(() => {
+        const dtEl = document.getElementById('current-date-time');
+        if (dtEl) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const time = now.toTimeString().split(' ')[0];
+            dtEl.innerText = `${year}-${month}-${day} ${time}`;
+        }
+    }, 1000);
 </script>
 </body>
 </html>
