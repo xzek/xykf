@@ -11,26 +11,23 @@
     // 2. 注入样式
     const style = document.createElement('style');
     style.innerHTML = `
-        /* ===== Reset (scoped) ===== */
-        #kefu-root * { margin: 0; padding: 0; box-sizing: border-box; }
-        #kefu-root {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-        }
-
+        /* ===== Reset (Pro 增强隔离) ===== */
+        #kefu-root, #kefu-root * { margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+        #kefu-root { font-family: -apple-system, system-ui, sans-serif !important; }
         /* ===== Floating Sidebar ===== */
         .kefu-sidebar {
-            position: fixed;
-            right: 20px;
-            bottom: 115px;
-            z-index: 9998;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #fff;
-            border-radius: 37px;
-            padding: 12px 8px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-            gap: 12px;
+            position: fixed !important;
+            right: 20px !important;
+            bottom: 115px !important;
+            z-index: 2147483647 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            background: #fff !important;
+            border-radius: 37px !important;
+            padding: 12px 8px !important;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1) !important;
+            gap: 12px !important;
         }
         .kefu-sidebar-icon {
             position: relative;
@@ -129,26 +126,16 @@
         .kefu-window {
             position: fixed;
             right: 90px;
-            bottom: 100px;
-            width: 380px;
-            height: 560px;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.15);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transform: scale(0.8) translateY(20px);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-origin: bottom right;
+            z-index: 2147483647 !important;
+            display: none !important; /* 初始完全隐藏 */
+            flex-direction: column !important;
+            overflow: hidden !important;
         }
         .kefu-window.open {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-            pointer-events: auto;
+            display: flex !important; /* 打开时才进入 flex 布局 */
+            transform: scale(1) translateY(0) !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
         }
 
         /* Header */
@@ -246,29 +233,22 @@
 
         /* Messages */
         .kefu-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: #f8f9fa;
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            background: #f8f9fa !important;
         }
         .kefu-messages::-webkit-scrollbar { width: 4px; }
         .kefu-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
         .kefu-msg {
-            display: flex;
-            gap: 8px;
-            max-width: 85%;
-            animation: kefu-msgIn 0.3s ease;
+            display: flex !important;
+            gap: 8px !important;
+            max-width: 85% !important;
         }
-        @keyframes kefu-msgIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .kefu-msg.agent { align-self: flex-start; }
-        .kefu-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+        .kefu-msg.agent { align-self: flex-start !important; }
+        .kefu-msg.user { align-self: flex-end !important; flex-direction: row-reverse !important; }
 
         .kefu-msg-avatar {
             width: 32px;
