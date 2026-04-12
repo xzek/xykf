@@ -345,7 +345,7 @@
         <div class="login-box">
             <h2>客服控制台</h2>
             <div class="input-group"><input type="text" id="username" placeholder="用户名 (默认 admin)"></div>
-            <div class="input-group"><input type="password" id="password" placeholder="密码"></div>
+            <div class="input-group"><input type="password" id="password" placeholder="密码 (默认 123456)"></div>
             <button class="btn" onclick="login()">登录</button>
         </div>
     </div>
@@ -450,7 +450,6 @@
                             <div class="input-group">
                                 <label>对话框风格</label>
                                 <select id="set-widget-theme">
-                                    <option value="xykf">夏雨风格 (xykf.js)</option>
                                     <option value="widget">默认风格 (widget.js)</option>
                                     <option value="WeChat">微信风格 (WeChat.js)</option>
                                 </select>
@@ -469,14 +468,6 @@
                             <h3>💬 自动回复与快捷回复</h3>
                             <div class="input-group"><label>自动回复设置</label><textarea id="set-auto-reply" rows="3" placeholder="例如：你好，请问有什么可以帮您？"></textarea></div>
                             <div class="input-group"><label>客户快捷提问 (格式：问题|自动回复内容，每行一条)</label><textarea id="set-faq-list" rows="4" placeholder="使用教程|请访问 xxx 获取教程&#10;人工服务|正在为您转接人工客服..."></textarea></div>
-                        </div>
-                        <div id="tab-kefu-ui" class="tab-pane">
-                            <h3>✨ 客服组件增强设置</h3>
-                            <div class="input-group"><label>客服窗口标题</label><input type="text" id="set-title" placeholder="在线客服"></div>
-                            <div class="input-group"><label>欢迎语</label><textarea id="set-welcome" rows="2" placeholder="👋 您好！请问有什么可以帮您的？"></textarea></div>
-                            <div class="input-group"><label>版权文字 (Powered By)</label><input type="text" id="set-poweredBy" placeholder="Customer Service"></div>
-                            <div class="input-group"><label>联系邮箱</label><input type="email" id="set-email" placeholder="support@example.com"></div>
-                            <div class="input-group"><label>Telegram 账号</label><input type="text" id="set-telegram" placeholder="@username"></div>
                         </div>
 
                         <div id="tab-export" class="tab-pane">
@@ -779,11 +770,6 @@
         document.getElementById('set-mobile-icon-pos').value = data.mobile_icon_pos || "";
         document.getElementById('set-auto-reply').value = data.auto_reply || "";
         document.getElementById('set-faq-list').value = data.faq_list || "";
-        document.getElementById('set-title').value = data.title || "";
-        document.getElementById('set-welcome').value = data.welcome || "";
-        document.getElementById('set-poweredBy').value = data.powered_by || "";
-        document.getElementById('set-email').value = data.email || "";
-        document.getElementById('set-telegram').value = data.telegram || "";
     }
     
     function closeSettings() { 
@@ -848,12 +834,7 @@
             mobileIconSize: document.getElementById('set-mobile-icon-size').value,
             mobileIconPos: document.getElementById('set-mobile-icon-pos').value,
             autoReply: document.getElementById('set-auto-reply').value,
-            faqList: document.getElementById('set-faq-list').value,
-            title: document.getElementById('set-title').value,
-            welcome: document.getElementById('set-welcome').value,
-            poweredBy: document.getElementById('set-poweredBy').value,
-            email: document.getElementById('set-email').value,
-            telegram: document.getElementById('set-telegram').value
+            faqList: document.getElementById('set-faq-list').value
         };
         if (u) payload.username = u;
         if (p) payload.password = p;
