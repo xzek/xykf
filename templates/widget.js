@@ -11,7 +11,7 @@
     const style = document.createElement('style');
     style.innerHTML = `
        /* 容器与全局字体 */
-        #cs-widget { position: fixed; bottom: 80px; right: 24px; z-index: 9999; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: flex-end; }
+        #cs-widget { visibility: hidden; position: fixed; bottom: 80px; right: 24px; z-index: 9999; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: flex-end; }
         #cs-widget * { outline: none !important; -webkit-tap-highlight-color: transparent !important; }
         /* 悬浮按钮 - 渐变色、阴影与悬浮放大效果 */
         #cs-toggle { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 58px; height: 58px; border-radius: 32px; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(118, 75, 162, 0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; }
@@ -176,7 +176,10 @@
                 });
             }
         }
-    }).catch(e => {});
+    container.style.visibility = 'visible'; // 样式应用后显示
+    }).catch(e => {
+        container.style.visibility = 'visible'; // 请求失败也显示（兜底）
+    });
 
     let lastMsgTime = 0;
     function appendMsg(text, sender, timeStr) {
