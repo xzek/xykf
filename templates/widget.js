@@ -1,5 +1,4 @@
 (function() {
-    // 1. 基础设置与 ID 获取 (保持与原版逻辑一致)
     const scriptTag = document.currentScript;
     const API_BASE = scriptTag ? new URL(scriptTag.src).origin : ""; 
     let userId = localStorage.getItem("cs_user_id");
