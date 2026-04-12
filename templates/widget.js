@@ -72,11 +72,14 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         /* 移动端按屏幕宽度等比缩小适配 */
+        @media (max-width: 520px) { 
+        #cs-widget { transform-origin: bottom right; transform: scale(0.9); } 
+        .cs-msg, #cs-input { font-size: 14px; } 
+        #cs-panel { height: 85vh; }
+        }
         @media (max-width: 480px) { #cs-widget { transform-origin: bottom right; transform: scale(0.9); } }
         @media (max-width: 400px) { 
-            #cs-widget { transform-origin: bottom right; transform: scale(0.8); } 
-            .cs-msg, #cs-input { font-size: 14px; } 
-            #cs-panel { height: 85vh; } 
+            #cs-widget { transform-origin: bottom right; transform: scale(0.8); }  
         }
         @media (max-width: 350px) { 
             #cs-widget { transform-origin: bottom right; transform: scale(0.7); } 
