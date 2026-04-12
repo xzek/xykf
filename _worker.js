@@ -54,11 +54,6 @@ export default {
             if (pcIconPos !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('pc_icon_pos', ?)").bind(pcIconPos).run();
             if (mobileIconSize !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('mobile_icon_size', ?)").bind(mobileIconSize).run();
             if (mobileIconPos !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('mobile_icon_pos', ?)").bind(mobileIconPos).run();
-            if (reqData.title !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('title', ?)").bind(reqData.title).run();
-            if (reqData.welcome !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('welcome', ?)").bind(reqData.welcome).run();
-            if (reqData.poweredBy !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('powered_by', ?)").bind(reqData.poweredBy).run();
-            if (reqData.email !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('email', ?)").bind(reqData.email).run();
-            if (reqData.telegram !== undefined) await env.db.prepare("INSERT OR REPLACE INTO config (key, value) VALUES ('telegram', ?)").bind(reqData.telegram).run();
             if (userIcon !== undefined) await env.db.prepare("UPDATE config SET value = ? WHERE key = 'user_icon'").bind(userIcon).run();
             if (autoReply !== undefined) await env.db.prepare("UPDATE config SET value = ? WHERE key = 'auto_reply'").bind(autoReply).run();
             if (quickReply !== undefined) await env.db.prepare("UPDATE config SET value = ? WHERE key = 'quick_reply'").bind(quickReply).run();
@@ -179,7 +174,7 @@ export default {
         } 
 
         /* ================= Customer API ================= */
-        if (url.pathname === "/api/customer/config" && method === "GET") { return new Response(JSON.stringify({ agent_icon: config.agent_icon, user_icon: config.user_icon, faq_list: config.faq_list, pc_icon_size: config.pc_icon_size, pc_icon_pos: config.pc_icon_pos, mobile_icon_size: config.mobile_icon_size, mobile_icon_pos: config.mobile_icon_pos, title: config.title || '', welcome: config.welcome || '', powered_by: config.powered_by || '', email: config.email || '', telegram: config.telegram || '' }), { headers: { ...corsHeaders, "Content-Type": "application/json" } }); }
+        if (url.pathname === "/api/customer/config" && method === "GET") { return new Response(JSON.stringify({ agent_icon: config.agent_icon, user_icon: config.user_icon, faq_list: config.faq_list, pc_icon_size: config.pc_icon_size, pc_icon_pos: config.pc_icon_pos, mobile_icon_size: config.mobile_icon_size, mobile_icon_pos: config.mobile_icon_pos }), { headers: { ...corsHeaders, "Content-Type": "application/json" } }); }
         if (url.pathname === "/api/customer/send" && method === "POST") {
           let { userId, content } = await request.json();
           let topicId = null;
