@@ -62,11 +62,11 @@
         
         /* 输入区 */
         #cs-input-area { padding: 16px; background: white; border-top: 1px solid #f0f0f0; display: flex; align-items: center; }
-        #cs-input { flex: 1; min-width: 0; box-sizing: border-box; margin-right: 12px; padding: 12px 16px; border: 1px solid #e4e4e4; border-radius: 24px; outline: none; font-size: 14px; background: #f8f9fa; transition: all 0.3s; }
+        #cs-input { flex: 1; min-width: 0; box-sizing: border-box; margin-right: 12px; padding: 8px 10px; border: 1px solid #e4e4e4; border-radius: 24px; outline: none; font-size: 14px; background: #f8f9fa; transition: all 0.3s; }
         #cs-input:focus { border-color: #764ba2; background: white; box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1); }
         
         /* 发送按钮 */
-        #cs-send { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3); transition: transform 0.2s; flex-shrink: 0; }
+        #cs-send { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; width: 39px; height: 39px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3); transition: transform 0.2s; flex-shrink: 0; }
         #cs-send:hover { transform: scale(1.1); }
         #cs-send svg { width: 18px; height: 18px; fill: white; transform: translateX(0px); } /* 让纸飞机视觉居中 */
         
@@ -76,7 +76,7 @@
         @media (max-width: 480px) { #cs-widget { transform-origin: bottom right; transform: scale(0.9); } }
         @media (max-width: 400px) { 
             #cs-widget { transform-origin: bottom right; transform: scale(0.8); } 
-            .cs-msg, #cs-input { font-size: 16px; } 
+            .cs-msg, #cs-input { font-size: 14px; } 
         }
         @media (max-width: 350px) { 
             #cs-widget { transform-origin: bottom right; transform: scale(0.7); } 
@@ -107,7 +107,7 @@
             <div id="cs-faq-area" style="display:none;"></div>
             <div id="cs-input-area">
                 <input type="file" id="cs-upload-input" accept="image/*" style="display:none;">
-                <button id="cs-upload-btn" style="background:none; border:none; cursor:pointer; padding:0 12px 0 0; display:flex; align-items:center;">
+                <button id="cs-upload-btn" style="background:none; border:none; cursor:pointer; padding:0 10px 0 0; display:flex; align-items:center;">
                     <svg viewBox="0 0 24 24" style="width:24px; height:24px; fill:#764ba2;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                 </button>
                 <input type="text" id="cs-input" placeholder="输入你想咨询的问题...">
