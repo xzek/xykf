@@ -76,6 +76,7 @@
         @media (max-width: 400px) { 
             #cs-widget { transform-origin: bottom right; transform: scale(0.8); } 
             .cs-msg, #cs-input { font-size: 14px; } 
+            #cs-panel { height: 85vh; } 
         }
         @media (max-width: 350px) { 
             #cs-widget { transform-origin: bottom right; transform: scale(0.7); } 
