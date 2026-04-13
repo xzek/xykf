@@ -76,7 +76,6 @@
         @media (max-width: 520px) { 
         #cs-widget { transform-origin: bottom right; transform: scale(0.9); } 
         .cs-msg, #cs-input { font-size: 14px; } 
-        #cs-panel { height: 85vh; }
         #cs-input-area { padding: 16px; background: white; border-top: 1px solid #f0f0f0; display: flex; align-items: center; } 
         #cs-faq-area { padding: 6px 6px 3px; }
         }
