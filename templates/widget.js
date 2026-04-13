@@ -79,7 +79,6 @@
         #cs-input-area { padding: 16px; background: white; border-top: 1px solid #f0f0f0; display: flex; align-items: center; } 
         #cs-faq-area { padding: 6px 6px 3px; }
         }
-        @media (max-width: 480px) { #cs-widget { transform-origin: bottom right; transform: scale(0.9); } }
         @media (max-width: 400px) { 
             #cs-widget { transform-origin: bottom right; transform: scale(0.8); }  
         }
