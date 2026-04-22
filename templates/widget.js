@@ -73,7 +73,7 @@
         
         /* 移动端按屏幕宽度等比缩小适配 */
         @media (max-width: 991px) {  
-            #cs-panel { height: 70vh; }
+            #cs-panel { height: 65vh; }
             #cs-widget { transform-origin: bottom right; transform: scale(0.7); }
             .cs-msg, #cs-input { font-size: 14px; } 
             #cs-input-area { padding: 16px; background: white; border-top: 1px solid #f0f0f0; display: flex; align-items: center; } 
